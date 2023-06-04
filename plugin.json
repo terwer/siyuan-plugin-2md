@@ -1,0 +1,32 @@
+{
+  "name": "siyuan-plugin-2md",
+  "author": "terwer",
+  "url": "https://github.com/terwer/siyuan-plugin-2md",
+  "version": "0.1.0",
+  "minAppVersion": "2.8.9",
+  "backends": [
+    "windows",
+    "linux",
+    "darwin"
+  ],
+  "frontends": [
+    "desktop"
+  ],
+  "displayName": {
+    "en_US": "Markdown batch conversion",
+    "zh_CN": "Markdown批量转换"
+  },
+  "description": {
+    "en_US": "Batch convert the documents of Siyuan Notes into Markdown files, and support the conversion properties of FrontFormatter corresponding to Hexo, HUGO, Vitepress, Obsidian and other platforms",
+    "zh_CN": "将思源笔记的文档批量转换为Markdown文件，支持转换属性为Hexo、HUGO、Vitepress、Obsidian等平台对应的FrontFormatter\n️"
+  },
+  "readme": {
+    "en_US": "README.md",
+    "zh_CN": "README_zh_CN.md"
+  },
+  "funding": {
+    "custom": [
+      "https://afdian.net/a/terwer"
+    ]
+  }
+}
