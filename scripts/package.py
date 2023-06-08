@@ -14,9 +14,9 @@ if __name__ == "__main__":
     v = data["version"]
 
     src_folder = dist_folder
-    tmp_folder_name = "./siyuan-importer"
+    tmp_folder_name = "./siyuan-plugin-2md"
     build_zip_path = "./build"
-    build_zip_name = "siyuan-plugin-custom-slug-" + v + ".zip"
+    build_zip_name = "siyuan-plugin-2md-" + v + ".zip"
 
     try:
         # 压缩dist为zip
