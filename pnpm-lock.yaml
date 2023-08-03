@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   zhi-common:
-    specifier: ^1.8.2
-    version: 1.8.2
+    specifier: ^1.11.6
+    version: 1.11.6
   zhi-device:
     specifier: ^1.0.1
     version: 1.0.1
@@ -2397,10 +2397,10 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /zhi-common@1.8.2:
-    resolution: {integrity: sha512-NId4eH3fn05mWZS6zohvGja0iCfNBwAqx7ggxxPBTw/Zx+uk6EmKh55kc6WmxJmaW1vqi/orWvkCxTkVNNQdQw==}
+  /zhi-common@1.11.6:
+    resolution: {integrity: sha512-gkMR/t0udj+d/etou4OLZHed+PSD+DehI6fQHGy4nzDR1IhIGSbynuPwuYSOZSxrYS1Yx1w1nNCA5brugAXb6w==}
     dependencies:
-      zhi-lib-base: 0.1.0
+      zhi-lib-base: 0.4.2
     dev: false
 
   /zhi-device@1.0.1:
@@ -2409,4 +2409,8 @@ packages:
 
   /zhi-lib-base@0.1.0:
     resolution: {integrity: sha512-Ls3VJgLWCnfhEWOAfxVVJ8mWoeEIXwukRe5ay+n4FjTRQRzpRTMU/yV7t1ytT3CubsP1XmAbiPUq3k6nCVetNw==}
+    dev: false
+
+  /zhi-lib-base@0.4.2:
+    resolution: {integrity: sha512-kfKgN4hb5efUf+k5Y9028CVV1p/hsnK0NbRsxI3uwJoTlHfTBjfi6ZfrkhDn+XEnEYeWidO75sx4RdcnT7C3KA==}
     dev: false
