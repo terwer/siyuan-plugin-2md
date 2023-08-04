@@ -38,7 +38,7 @@
     "vite-plugin-zip-pack": "^1.0.5"
   },
   "dependencies": {
-    "zhi-common": "^1.8.2",
+    "zhi-common": "^1.11.7",
     "zhi-device": "^1.0.1",
     "zhi-lib-base": "^0.1.0"
   }
