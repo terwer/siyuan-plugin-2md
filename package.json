@@ -40,6 +40,6 @@
   "dependencies": {
     "zhi-common": "^1.8.2",
     "zhi-device": "^1.0.1",
-    "zhi-lib-base": "^0.1.0"
+    "zhi-lib-base": "^0.4.4"
   }
 }
