@@ -46,12 +46,12 @@ export async function initTopbar(pluginInstance: ExportMdPlugin) {
     pluginInstance.logger.info("Start syncing markdown files ...")
     const startTime = Date.now()
 
-    await pluginInstance.markdownRender.renderMd()
+    const count = await pluginInstance.markdownRender.renderMd()
 
-    pluginInstance.logger.info("Markdown files synced.")
+    pluginInstance.logger.info(`Synced (${count}) markdown files.`)
     const endTime = Date.now()
     const cost = ((endTime - startTime) / 1000.0).toFixed(2)
-    pluginInstance.logger.info(`Markdown files render success cost: ${cost} seconds`)
+    pluginInstance.logger.info(`Render cost: ${cost} seconds`)
 
     event.stopPropagation()
   })

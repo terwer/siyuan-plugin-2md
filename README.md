@@ -4,7 +4,7 @@
 
 <img src="./icon.png" width="160" height="160" alt="icon">
 
-Batch convert the documents of Siyuan Notes into Markdown files, and support the conversion properties of FrontFormatter corresponding to Hexo, HUGO, Vitepress, Obsidian and other platforms
+Batch convert the documents of Siyuan Notes into Markdown files, and support the conversion properties of FrontFormatter corresponding to Hexo, Hugo, Vitepress, Obsidian and other platforms
 
 ## Core Features
 
