@@ -43,14 +43,12 @@ export default class ExportMdPlugin extends Plugin {
   public isMobile: boolean
   public logger
   public kernelApi: KernelApi
-  readonly markdownRender
 
   constructor(options: { app: App; id: string; name: string; i18n: IObject }) {
     super(options)
 
     this.logger = simpleLogger("index", "export-md", isDev)
     this.kernelApi = new KernelApi()
-    this.markdownRender = new MarkdownRenderer(this)
   }
 
   async onload() {

@@ -37,11 +37,11 @@ import { StrUtil, ZhiCommon } from "zhi-common"
  * @since 1.0.0
  */
 class MarkdownRenderer {
-  private readonly logger
-  private readonly kernelApi: KernelApi
+  protected readonly logger
+  protected readonly kernelApi: KernelApi
   private readonly common
-  private readonly notebook
-  private readonly outputFolder
+  protected readonly notebook
+  protected readonly outputFolder
 
   constructor(pluginInstance: ExportMdPlugin) {
     this.logger = simpleLogger("markdown-renderer", "export-md", isDev)
@@ -49,10 +49,11 @@ class MarkdownRenderer {
     this.kernelApi = new KernelApi()
     this.common = new ZhiCommon()
 
-    // this.notebook = "20230722212235-lwhprdc"
+    this.notebook = "20231011174146-kexkngw"
     // 正式
-    this.notebook = "20220712031439-h4ut7wc"
-    this.outputFolder = "/Users/terwer/Downloads/siyuan2md/default"
+    // this.notebook = "20220712031439-h4ut7wc"
+    // this.outputFolder = "/Users/terwer/Downloads/siyuan2md/default"
+    this.outputFolder = "/Users/terwer/Documents/mydocs/terwer.github.io/docs"
     // const appDataFolder = this.common.electronUtil.getCrossPlatformAppDataFolder()
     // this.outputFolder = this.common.electronUtil.joinPath(appDataFolder, "siyuan2md", "default")
   }
@@ -124,7 +125,7 @@ class MarkdownRenderer {
    * @param path 路径，根路径传空
    * @private
    */
-  private async getAllFileList(notebook: string, path: string): Promise<any> {
+  protected async getAllFileList(notebook: string, path: string): Promise<any> {
     const that = this
     const ret: any[] = []
     const nameMap = {}
