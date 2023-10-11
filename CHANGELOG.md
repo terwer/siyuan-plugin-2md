@@ -1,6 +1,18 @@
 <!-- insertion marker -->
 <a name="v0.0.3"></a>
 
+## 1.0.0 (2023-10-11)
+
+
+### Features
+
+* Markdown 批量转换第一版 ([7cb5e7d](https://github.com/terwer/siyuan-plugin-2md/commit/7cb5e7d899c310d797a3cc9fbf7ea689297efa4c))
+* Markdown 批量转换第一版 ([a3de3be](https://github.com/terwer/siyuan-plugin-2md/commit/a3de3beb44476c5102287ff0e0628c9dacec0e58))
+* 导出到 Vuepress ([9f1b4eb](https://github.com/terwer/siyuan-plugin-2md/commit/9f1b4eb2300060d502b73199491194717624f7d8))
+* 支持导出目录 ([7087b6b](https://github.com/terwer/siyuan-plugin-2md/commit/7087b6b8c89bc4370dd6a1f2a1176b2c5f0e1574))
+* 适配 FrontFormatter ([76ea8e5](https://github.com/terwer/siyuan-plugin-2md/commit/76ea8e58dc15783d42552c04cd4df0c667cc4b81))
+* 适配 FrontFormatter ([8477bf3](https://github.com/terwer/siyuan-plugin-2md/commit/8477bf3aae8b74443c1d56137e6f6bac0a1244fd))
+
 ## [0.1.0](https://github.com/terwer/siyuan-plugin-custom-slug/compare/v0.0.3...v0.1.0) (2023-06-01)
 ### Features
 * 刚刚闹了个乌龙，重新打包一次 ([6c4d62b](https://github.com/terwer/siyuan-plugin-custom-slug/commit/6c4d62bb00e34f3e568bb789bb70aefc75af939f))
