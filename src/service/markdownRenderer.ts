@@ -49,7 +49,9 @@ class MarkdownRenderer {
     this.kernelApi = new KernelApi()
     this.common = new ZhiCommon()
 
-    this.notebook = "20230722212235-lwhprdc"
+    // this.notebook = "20230722212235-lwhprdc"
+    // 正式
+    this.notebook = "20220712031439-h4ut7wc"
     this.outputFolder = "/Users/terwer/Downloads/siyuan2md/default"
     // const appDataFolder = this.common.electronUtil.getCrossPlatformAppDataFolder()
     // this.outputFolder = this.common.electronUtil.joinPath(appDataFolder, "siyuan2md", "default")
@@ -112,7 +114,7 @@ class MarkdownRenderer {
       await fsPromise.writeFile(save_file, md, { encoding: "utf8" })
     }
 
-    return ret.length
+    return files.length
   }
 
   /**
