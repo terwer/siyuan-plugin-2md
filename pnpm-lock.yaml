@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -9,8 +9,8 @@ dependencies:
     specifier: ^1.8.2
     version: 1.8.2
   zhi-device:
-    specifier: ^1.0.1
-    version: 1.0.1
+    specifier: ^2.3.1
+    version: 2.3.1
   zhi-lib-base:
     specifier: ^0.1.0
     version: 0.1.0
@@ -2403,8 +2403,8 @@ packages:
       zhi-lib-base: 0.1.0
     dev: false
 
-  /zhi-device@1.0.1:
-    resolution: {integrity: sha512-843k55Imvm0Ld4vIrpz2N4IPibrWcVSnOyK78irZZPaUXLFmSn4Naot7ixBKmxncXyihzfLk3XVHkIxvJHWhOA==}
+  /zhi-device@2.3.1:
+    resolution: {integrity: sha512-HLNroA/bIHrEPQTaOC0gZyR42FpaxSJb/lc+LqWvtlazsxeOiYAc9HhFHBwJFdbikMqCogFWVFtGG7OMLYmaKg==}
     dev: false
 
   /zhi-lib-base@0.1.0:
