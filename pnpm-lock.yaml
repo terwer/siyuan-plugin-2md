@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -12,8 +12,8 @@ dependencies:
     specifier: ^1.0.1
     version: 1.0.1
   zhi-lib-base:
-    specifier: ^0.1.0
-    version: 0.1.0
+    specifier: ^0.5.0
+    version: 0.5.0
 
 devDependencies:
   '@sveltejs/vite-plugin-svelte':
@@ -2409,4 +2409,8 @@ packages:
 
   /zhi-lib-base@0.1.0:
     resolution: {integrity: sha512-Ls3VJgLWCnfhEWOAfxVVJ8mWoeEIXwukRe5ay+n4FjTRQRzpRTMU/yV7t1ytT3CubsP1XmAbiPUq3k6nCVetNw==}
+    dev: false
+
+  /zhi-lib-base@0.5.0:
+    resolution: {integrity: sha512-56QfNhYA5HgmnTWRmOxD4UDpOplR0dcpmdq4ZxRFqBtr3eyHdEmm0qBITJt6kk7lzbPNPD2wgsuHq7pnz+9OQg==}
     dev: false
