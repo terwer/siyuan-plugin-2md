@@ -1,3 +1,5 @@
+import PlatformType from "./PlatformType"
+
 /**
  * 偏好设置
  *

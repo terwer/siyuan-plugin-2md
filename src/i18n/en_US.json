@@ -15,6 +15,7 @@
     "basePath": "Document Root Path",
     "assetFolder": "Asset Root Folder",
     "exportButton": "Start Export",
-    "exporting": "Exporting, please wait..."
+    "exporting": "Exporting, please wait...",
+    "outputFolderEmpty": "Output folder can not be empty"
   }
 }

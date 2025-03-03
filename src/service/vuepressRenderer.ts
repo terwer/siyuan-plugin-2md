@@ -27,6 +27,7 @@ import BaseMarkdownRenderer from "./baseMarkdownRenderer"
 import { SiyuanDevice } from "zhi-device"
 import { isDev } from "../Constants"
 import RenderOptions from "../models/renderOptions"
+import { StrUtil } from "zhi-common"
 
 /**
  * Markdown渲染器
@@ -40,11 +41,11 @@ class VuepressRenderer extends BaseMarkdownRenderer {
     const notebook = "20210808180117-czj9bvb"
     const workspaceFolder = SiyuanDevice.siyuanWorkspacePath()
     const outputFolder = SiyuanDevice.joinPath(workspaceFolder, "temp", "siyuan2md", "vuepress")
-    opts.notebook = notebook
-    opts.outputFolder = outputFolder
-    if (isDev) {
-      opts.notebook = "20231011174146-kexkngw"
-      opts.outputFolder = "/Users/terwer/Downloads/vuepress-demo/docs"
+    if (StrUtil.isEmptyString(opts.notebook)) {
+      opts.notebook = notebook
+    }
+    if (StrUtil.isEmptyString(opts.outputFolder)) {
+      opts.outputFolder = outputFolder
     }
     this.logger.info(`vuepress outputFolder => ${opts.outputFolder}`)
   }

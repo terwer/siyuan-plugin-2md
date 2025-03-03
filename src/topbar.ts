@@ -25,8 +25,9 @@
 
 import ExportMdPlugin from "./index"
 import { icons } from "./utils/svg"
-import { Menu } from "siyuan"
+import { Dialog, Menu } from "siyuan"
 import Export from "./libs/Export.svelte"
+import pkg from "../package.json"
 
 class Topbar {
   protected pluginInstance: ExportMdPlugin
@@ -54,28 +55,17 @@ class Topbar {
     })
 
     topBarElement.addEventListener("click", async (event) => {
-      const menu = new Menu("exportMdMenu")
-      // 创建独立容器（关键修复点）
-      const container = document.createElement("div")
-      container.className = "export-md-container"
-      // 创建带有容器的菜单项
-      menu.addItem({
-        element: container, // 显式指定容器
-        iconHTML: "",
-        label: "",
+      const exportId = "export-md-dialog"
+      const d = new Dialog({
+        title: `${this.pluginInstance.i18n.exportMd} - ${this.pluginInstance.i18n.sharePro} v${pkg.version}`,
+        content: `<div id="${exportId}"></div>`,
+        width: this.pluginInstance.isMobile ? "92vw" : "61.8vw",
       })
       new Export({
-        target: container,
+        target: document.getElementById(exportId) as HTMLElement,
         props: {
           pluginInstance: this.pluginInstance,
         },
-      })
-      // 显示菜单
-      const rect = topBarElement.getBoundingClientRect()
-      menu.open({
-        x: rect.right,
-        y: rect.bottom,
-        isLeft: true,
       })
     })
   }

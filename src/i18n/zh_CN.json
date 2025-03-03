@@ -15,6 +15,7 @@
     "basePath": "文档根路径",
     "assetFolder": "资源文件根路径",
     "exportButton": "开始导出",
-    "exporting": "正在导出，请稍后..."
+    "exporting": "正在导出，请稍后...",
+    "outputFolderEmpty": "输出路径不能为空"
   }
 }

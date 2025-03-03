@@ -40,7 +40,7 @@ import RenderOptions from "../models/renderOptions"
 class BaseMarkdownRenderer {
   protected readonly logger: ILogger
   protected readonly kernelApi: KernelApi
-  protected readonly opts: RenderOptions
+  protected opts: RenderOptions
 
   constructor(pluginInstance: ExportMdPlugin) {
     this.logger = simpleLogger("base-markdown-renderer", "export-md", isDev)
@@ -59,6 +59,10 @@ class BaseMarkdownRenderer {
     opts.linkAsPlainText = false
     this.opts = opts
     this.logger.info(`default outputFolder => ${this.opts.outputFolder}`)
+  }
+
+  public setOpts(opts: RenderOptions) {
+    this.opts = opts
   }
 
   /**

@@ -3,8 +3,15 @@
   import { onMount } from "svelte"
   import { StrUtil } from "zhi-common"
   import PlatformType from "../models/PlatformType"
+  // import { Dialog } from "siyuan"
+  import { SiyuanDevice } from "zhi-device"
+  import ExportService from "../service/exportService"
+  import { showMessage } from "siyuan"
+  import RenderOptions from "../models/renderOptions"
 
   export let pluginInstance: ExportMdPlugin
+  // export let d: Dialog
+  const exportService = new ExportService(pluginInstance)
 
   // 导出配置数据
   let exportConfig = {
@@ -14,7 +21,7 @@
     linkAsPlainText: false,
     basePath: "/",
     assetFolder: "/assets",
-    platform: PlatformType.MKDOCS,
+    platform: PlatformType.DEFAULT,
   }
 
   let notebooks = []
@@ -29,14 +36,62 @@
   let isAdvancedOpen = false
   let isExporting = false
 
-  const handleBrowse = async () => {}
+  const getCurrentPlatformName = () => {
+    return platforms.find((p) => p.id === exportConfig.platform)?.name
+  }
+
+  const handleBrowse = async () => {
+    const mainWin = SiyuanDevice.siyuanWindow()
+    const { app, BrowserWindow, getCurrentWindow, dialog } = mainWin.require("@electron/remote")
+    // const remote = mainWin.require("@electron/remote").require("@electron/remote/main")
+    const result = await dialog.showOpenDialog({
+      title: "选择输出目录",
+      properties: ["openDirectory", "createDirectory"],
+    })
+
+    if (!result.canceled && result.filePaths.length > 0) {
+      // export上下文中已存在的
+      exportConfig.outputFolder = result.filePaths[0]
+    }
+  }
 
   const handleExport = async () => {
-    switch (exportConfig.platform) {
-      case PlatformType.HEXO:
-        break
-      case PlatformType.HUGO:
-        break
+    if (StrUtil.isEmptyString(exportConfig.outputFolder)) {
+      showMessage(pluginInstance.i18n.export.outputFolderEmpty, 7000, "error")
+      return
+    }
+    // 如果文件夹不为空。需要提示 confirm
+    const mainWin = SiyuanDevice.siyuanWindow()
+    const { app, BrowserWindow, getCurrentWindow, dialog } = mainWin.require("@electron/remote")
+    const fs = SiyuanDevice.requireNpm("fs")
+    if (fs.existsSync(exportConfig.outputFolder)) {
+      const files = fs.readdirSync(exportConfig.outputFolder).filter((f) => !f.startsWith(".") && f !== ".DS_Store")
+      // 过滤隐藏文件和.DS_Store
+      if (files.length > 0) {
+        const { response } = await dialog.showMessageBox({
+          type: "warning",
+          title: "导出",
+          message: "导出目录不为空，本操作会覆盖旧文档，是否继续？",
+          buttons: ["取消", "继续"],
+        })
+
+        // 当点击取消按钮（索引 0）时中止导出
+        if (response === 0) {
+          return
+        }
+      }
+    }
+    try {
+      isExporting = true
+      const startTime = Date.now()
+      const counts = await exportService.doExport(exportConfig)
+      const endTime = Date.now()
+      const cost = ((endTime - startTime) / 1000.0).toFixed(2)
+      showMessage(`导出完成，共导出 ${counts} 个文件，耗时：${cost}s`, 7000, "info")
+    } catch (e) {
+      showMessage(e.toString(), 7000, "error")
+    } finally {
+      isExporting = false
     }
   }
 
@@ -51,7 +106,7 @@
 
 <div id="export-container">
   <div class="header-group">
-    <h3 class="title">{pluginInstance.i18n.export.title}</h3>
+    <h3 class="title">{pluginInstance.i18n.export.title} - {getCurrentPlatformName()}</h3>
     <div class="divider" />
   </div>
 
@@ -89,6 +144,7 @@
           class="platform-card"
           data-disabled={platform.disabled}
           data-selected={exportConfig.platform === platform.id}
+          on:click={() => !platform.disabled && (exportConfig.platform = platform.id)}
         >
           <input
             type="radio"
@@ -97,6 +153,7 @@
             bind:group={exportConfig.platform}
             class="platform-radio"
             disabled={platform.disabled}
+            on:change={() => (exportConfig.platform = platform.id)}
           />
           <span class="platform-content">
             <span class="platform-icon">{platform.icon}</span>
@@ -145,14 +202,20 @@
     {/if}
   </div>
 
-  <button class="export-btn" on:click={handleExport}>
-    {pluginInstance.i18n.export.exportButton}
+  <button class="export-btn" on:click={handleExport} disabled={isExporting}>
+    {#if isExporting}
+      <span class="loading-spinner" aria-hidden="true" />
+      {pluginInstance.i18n.export.exporting}
+    {:else}
+      {pluginInstance.i18n.export.exportButton}
+    {/if}
   </button>
 </div>
 
 <style lang="stylus">
   #export-container
-    width: 480px
+    min-width: 480px
+    max-width 100%
     padding: 16px
     font-size: 14px
     background: #fff
@@ -175,6 +238,8 @@
     gap: 8px
     input
       width 100%
+    button
+      width 30%
 
   .platform-group {
     margin: 12px 0;
@@ -284,6 +349,11 @@
     100% { transform: scale(1); }
   }
 
+  // 添加动画定义
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
   .switch-group
     display: flex
     flex-direction: row
@@ -371,9 +441,32 @@
     border-radius: 4px
     cursor: pointer
     transition: background 0.2s
-
+    position: relative;
+    font-size 14px
     &:hover
       background: #0069d9
+    &[disabled]
+      background: #a0aec0;
+      cursor: not-allowed;
+      opacity: 0.8;
+    &[disabled]:hover {
+      background: #8f9dae;
+    }
+    .loading-spinner
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+      vertical-align: middle
+
+  // 添加动画定义
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
 
   .input, .select
     background: #fff
@@ -418,6 +511,10 @@
       background: #1a73e8;
       &:hover {
         background: #1557b0;
+      }
+      .loading-spinner {
+        border: 2px solid rgba(224, 224, 224, 0.3);
+        border-top-color: #e0e0e0;
       }
     }
 
