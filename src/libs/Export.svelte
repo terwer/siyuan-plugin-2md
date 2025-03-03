@@ -143,6 +143,7 @@
     <label class="section-label">{pluginInstance.i18n.export.selectPlatform}</label>
     <div class="platform-options">
       {#each platforms as platform}
+        <!-- 在platform-card元素内添加遮罩层 -->
         <div
           class="platform-card"
           data-disabled={platform.disabled}
@@ -161,6 +162,11 @@
             <span class="platform-icon">{platform.icon}</span>
             <span class="platform-name">{platform.name}</span>
           </span>
+          {#if platform.disabled}
+            <div class="disabled-mask">
+              <span class="tip-text">暂未实现</span>
+            </div>
+          {/if}
         </div>
       {/each}
     </div>
@@ -273,6 +279,27 @@
       transition: all 0.2s ease;
       min-width: 0;
 
+      // 新增disabled-mask样式
+      .disabled-mask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+
+        .tip-text {
+          color: #fff;
+          font-size: 12px;
+          font-weight: 500;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); // 加强文字阴影
+        }
+      }
+
       &[data-disabled="true"] {
         pointer-events: none;
         opacity: 0.6;
@@ -349,11 +376,6 @@
     0% { transform: scale(0.98); }
     50% { transform: scale(1.02); }
     100% { transform: scale(1); }
-  }
-
-  // 添加动画定义
-  @keyframes spin {
-    to { transform: rotate(360deg); }
   }
 
   .switch-group
@@ -465,7 +487,6 @@
       margin-right: 8px;
       vertical-align: middle
 
-  // 添加动画定义
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
@@ -474,6 +495,7 @@
     background: #fff
     border: 1px solid #ddd
 
+  // 暗黑模式适配（必须放在最后）
   :global(html[data-theme-mode="dark"]) {
     #export-container {
       background: #2a2a2a;
@@ -534,6 +556,14 @@
       .platform-card {
         border-color: #334155;
         background: #1e293b;
+
+        .disabled-mask {
+          background: rgba(0, 0, 0, 0.5);
+          .tip-text {
+            color: rgba(255, 255, 255, 0.9); // 增加文字透明度
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+          }
+        }
 
         &[data-disabled="true"] {
           background: #404040;
