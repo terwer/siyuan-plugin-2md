@@ -108,13 +108,13 @@
   </div>
 
   <div class="switch-group">
-    <label class="switch-item">
+    <div class="switch-item">
       <div class="switch-container">
         <input type="checkbox" bind:checked={exportConfig.fixTitle} class="switch-input" />
         <span class="slider round" />
       </div>
       <span class="label-text">{pluginInstance.i18n.export.fixTitle}</span>
-    </label>
+    </div>
 
     <label class="switch-item">
       <div class="switch-container">
@@ -173,6 +173,8 @@
   .path-input-group
     display: flex
     gap: 8px
+    input
+      width 100%
 
   .platform-group {
     margin: 12px 0;

@@ -4,6 +4,17 @@
   "exportMd": "Markdown batch conversion",
   "export": {
     "title": "Custom export markdown document",
-    "selectNotebook": "Select Notebook"
+    "selectNotebook": "Select Notebook",
+    "outputPath": "Output Path",
+    "outputPathPlaceholder": "MD files will be saved here (requires system absolute path)",
+    "browse": "Browse Folder",
+    "selectPlatform": "Select Platform",
+    "fixTitle": "Remove Title Numbering",
+    "linkAsPlainText": "Ignore links (display as plain text)",
+    "advancedSettings": "Advanced Settings",
+    "basePath": "Document Root Path",
+    "assetFolder": "Asset Root Folder",
+    "exportButton": "Start Export",
+    "exporting": "Exporting, please wait..."
   }
 }
