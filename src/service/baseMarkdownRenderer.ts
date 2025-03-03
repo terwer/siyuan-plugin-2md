@@ -29,7 +29,7 @@ import ExportMdPlugin from "../index"
 import { SiyuanDevice } from "zhi-device"
 import KernelApi from "../api/kernel-api"
 import { HtmlUtil } from "zhi-common"
-import RenderOptions from "./renderOptions"
+import RenderOptions from "../models/renderOptions"
 
 /**
  * Markdown渲染器

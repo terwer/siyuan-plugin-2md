@@ -3,5 +3,7 @@
   "save": "保存",
   "exportMd": "Markdown批量转换",
   "export": {
+    "title": "自定义导出MD文件",
+    "selectNotebook": "选择笔记本"
   }
 }

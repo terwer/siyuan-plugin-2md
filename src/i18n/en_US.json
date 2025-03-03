@@ -3,5 +3,7 @@
   "save": "Save",
   "exportMd": "Markdown batch conversion",
   "export": {
+    "title": "Custom export markdown document",
+    "selectNotebook": "Select Notebook"
   }
 }

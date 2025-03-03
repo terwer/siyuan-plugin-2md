@@ -26,7 +26,7 @@
 import BaseMarkdownRenderer from "./baseMarkdownRenderer"
 import { SiyuanDevice } from "zhi-device"
 import { isDev } from "../Constants"
-import RenderOptions from "./renderOptions";
+import RenderOptions from "../models/renderOptions"
 
 /**
  * Markdown渲染器
