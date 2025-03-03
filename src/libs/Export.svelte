@@ -291,6 +291,9 @@
         align-items: center;
         justify-content: center;
         border-radius: 6px;
+        opacity: 0; // 👇🏻新增
+        transition: opacity 0.2s ease; // 👇🏻新增
+        pointer-events: none; // 👇🏻新增
 
         .tip-text {
           color: #fff;
@@ -301,13 +304,19 @@
       }
 
       &[data-disabled="true"] {
-        pointer-events: none;
+        pointer-events: auto; // 👇🏻修改（原为none）
+        cursor: not-allowed; // 👇🏻新增
         opacity: 0.6;
         background: #f5f5f5;
         border-color: #e0e0e0;
 
         .platform-icon, .platform-name {
           opacity: 0.7;
+        }
+
+        // 👇🏻新增hover状态
+        &:hover .disabled-mask {
+          opacity: 1;
         }
       }
 
