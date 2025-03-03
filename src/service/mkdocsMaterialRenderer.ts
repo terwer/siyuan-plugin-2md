@@ -1,5 +1,7 @@
 import BaseMarkdownRenderer from "./baseMarkdownRenderer"
 import ExportMdPlugin from "../index"
+import { SiyuanDevice } from "zhi-device"
+import { isDev } from "../Constants"
 
 /**
  * Markdown渲染器
@@ -12,13 +14,20 @@ class MkdocsMaterialRenderer extends BaseMarkdownRenderer {
     super(pluginInstance)
   }
 
+  protected async initConfig(): Promise<void> {
+    await super.initConfig()
+    this.notebook = "20210808180117-czj9bvb"
+    const workspaceFolder = SiyuanDevice.siyuanWorkspacePath()
+    this.outputFolder = SiyuanDevice.joinPath(workspaceFolder, "temp", "siyuan2md", "mkdocs-material")
+    if (isDev) {
+      this.notebook = "20231011174146-kexkngw"
+      this.outputFolder = "/Volumes/workspace/mydocs/other-projects/mkdocs-demo/demo/docs"
+    }
+    this.logger.info(`mkdocs-material outputFolder => ${this.outputFolder}`)
+  }
+
   public async renderMd() {
-    const startTime = Date.now()
-    const count = await super.renderMd()
-    const endTime = Date.now()
-    const cost = ((endTime - startTime) / 1000.0).toFixed(2)
-    this.logger.info(`Render cost: ${cost} seconds`)
-    return count
+    return await super.renderMd()
   }
 }
 

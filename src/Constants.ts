@@ -29,3 +29,4 @@ export const mediaDir = `./assets`
 export const isDev = process.env.DEV_MODE === "true"
 export const siyuanApiUrl = ""
 export const siyuanApiToken = ""
+export const defaultNotebook = "20210808180117-czj9bvb"

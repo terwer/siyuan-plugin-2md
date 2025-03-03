@@ -25,6 +25,7 @@
 
 import BaseMarkdownRenderer from "./baseMarkdownRenderer"
 import { SiyuanDevice } from "zhi-device"
+import { isDev } from "../Constants"
 
 /**
  * Markdown渲染器
@@ -33,7 +34,18 @@ import { SiyuanDevice } from "zhi-device"
  * @since 1.0.0
  */
 class VuepressRenderer extends BaseMarkdownRenderer {
-  public async renderMd() {
+  protected async initConfig(): Promise<void> {
+    await super.initConfig()
+    this.notebook = "20210808180117-czj9bvb"
+    const workspaceFolder = SiyuanDevice.siyuanWorkspacePath()
+    this.outputFolder = SiyuanDevice.joinPath(workspaceFolder, "temp", "siyuan2md", "vuepress")
+    if (isDev) {
+      this.outputFolder = "/Users/terwer/Downloads/vuepress-demo/docs"
+    }
+    this.logger.info(`vuepress outputFolder => ${this.outputFolder}`)
+  }
+
+  protected async renderMd() {
     this.logger.info("render md to vuepress")
     const fs = SiyuanDevice.requireLib("fs")
     const path = SiyuanDevice.requireLib("path")
@@ -55,8 +67,6 @@ class VuepressRenderer extends BaseMarkdownRenderer {
       let first_file: string
       let first_file_name: string
       let first_file_slug: string
-
-
 
       let save_dir: string
       let save_file: string

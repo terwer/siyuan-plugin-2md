@@ -10,7 +10,7 @@ Batch convert the documents of Siyuan Notes into Markdown files, and support the
 
 - **One-key operation**: Support one-key batch conversion
 - **Property Conversion**: Support property conversion to FrontFormatter
-- **Select Notes**: Support custom selection of notebooks, default all
+- **Select Notes**: Support custom selection of notebooks, default select first one
 - **Output Configuration**: Support custom output directory (the output directory of the corresponding platform can be set separately, and the default output is to the user `[siyuan-note Workspace]/temp/siyuan2md/[platform name]` directory)
 
 ## FAQ

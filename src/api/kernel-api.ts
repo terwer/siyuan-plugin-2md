@@ -47,6 +47,14 @@ class KernelApi extends BaseApi {
     const url = "/api/export/exportMdContent"
     return await this.siyuanRequest(url, data)
   }
+
+  public async getHPathByID(docId: string): Promise<SiyuanData> {
+    const data = {
+      id: docId,
+    }
+    const url = "/api/filetree/getHPathByID"
+    return await this.siyuanRequest(url, data)
+  }
 }
 
 export default KernelApi
