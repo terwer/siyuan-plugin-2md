@@ -3,18 +3,16 @@
   import { onMount } from "svelte"
   import { StrUtil } from "zhi-common"
   import PlatformType from "../models/PlatformType"
-  // import { Dialog } from "siyuan"
   import { SiyuanDevice } from "zhi-device"
   import ExportService from "../service/exportService"
   import { showMessage } from "siyuan"
-  import RenderOptions from "../models/renderOptions"
+  import { writable } from "svelte/store"
 
   export let pluginInstance: ExportMdPlugin
-  // export let d: Dialog
   const exportService = new ExportService(pluginInstance)
 
-  // 导出配置数据
-  let exportConfig = {
+  // 导出配置数据（改为响应式存储）
+  const exportConfig = writable({
     notebook: "",
     outputFolder: "",
     fixTitle: true,
@@ -22,10 +20,10 @@
     basePath: "/",
     assetFolder: "/assets",
     platform: PlatformType.DEFAULT,
-  }
+  })
 
   let notebooks = []
-  // 平台选项数据（增加disabled属性）
+  // 平台选项数据（保持原样）
   const platforms = [
     { id: PlatformType.DEFAULT, name: "通用MD", icon: "📁", disabled: false },
     { id: PlatformType.MKDOCS, name: "MkDocs", icon: "📘", disabled: false },
@@ -36,37 +34,36 @@
   let isAdvancedOpen = false
   let isExporting = false
 
-  const getCurrentPlatformName = () => {
-    return platforms.find((p) => p.id === exportConfig.platform)?.name
-  }
-
   const handleBrowse = async () => {
     const mainWin = SiyuanDevice.siyuanWindow()
-    const { app, BrowserWindow, getCurrentWindow, dialog } = mainWin.require("@electron/remote")
-    // const remote = mainWin.require("@electron/remote").require("@electron/remote/main")
+    const { dialog } = mainWin.require("@electron/remote")
     const result = await dialog.showOpenDialog({
       title: "选择输出目录",
       properties: ["openDirectory", "createDirectory"],
     })
 
     if (!result.canceled && result.filePaths.length > 0) {
-      // export上下文中已存在的
-      exportConfig.outputFolder = result.filePaths[0]
+      exportConfig.update((c) => ({ ...c, outputFolder: result.filePaths[0] }))
     }
   }
 
   const handleExport = async () => {
-    if (StrUtil.isEmptyString(exportConfig.outputFolder)) {
+    let currentConfig
+    const unsubscribe = exportConfig.subscribe((value) => {
+      currentConfig = value
+    })
+
+    if (StrUtil.isEmptyString(currentConfig.outputFolder)) {
       showMessage(pluginInstance.i18n.export.outputFolderEmpty, 7000, "error")
       return
     }
-    // 如果文件夹不为空。需要提示 confirm
+
     const mainWin = SiyuanDevice.siyuanWindow()
-    const { app, BrowserWindow, getCurrentWindow, dialog } = mainWin.require("@electron/remote")
+    const { dialog } = mainWin.require("@electron/remote")
     const fs = SiyuanDevice.requireNpm("fs")
-    if (fs.existsSync(exportConfig.outputFolder)) {
-      const files = fs.readdirSync(exportConfig.outputFolder).filter((f) => !f.startsWith(".") && f !== ".DS_Store")
-      // 过滤隐藏文件和.DS_Store
+
+    if (fs.existsSync(currentConfig.outputFolder)) {
+      const files = fs.readdirSync(currentConfig.outputFolder).filter((f) => !f.startsWith(".") && f !== ".DS_Store")
       if (files.length > 0) {
         const { response } = await dialog.showMessageBox({
           type: "warning",
@@ -75,16 +72,17 @@
           buttons: ["取消", "继续"],
         })
 
-        // 当点击取消按钮（索引 0）时中止导出
         if (response === 0) {
+          unsubscribe()
           return
         }
       }
     }
+
     try {
       isExporting = true
       const startTime = Date.now()
-      const counts = await exportService.doExport(exportConfig)
+      const counts = await exportService.doExport(currentConfig)
       const endTime = Date.now()
       const cost = ((endTime - startTime) / 1000.0).toFixed(2)
       showMessage(`导出完成，共导出 ${counts} 个文件，耗时：${cost}s`, 7000, "info")
@@ -92,28 +90,33 @@
       showMessage(e.toString(), 7000, "error")
     } finally {
       isExporting = false
+      unsubscribe()
     }
   }
 
   onMount(async () => {
     const res = await pluginInstance.kernelApi.lsNotebooks()
     notebooks = (res?.data as any)?.notebooks ?? []
-    if (StrUtil.isEmptyString(exportConfig.notebook)) {
-      exportConfig.notebook = notebooks[0]?.id
-    }
+    exportConfig.update((c) => ({
+      ...c,
+      notebook: c.notebook || notebooks[0]?.id,
+    }))
   })
 </script>
 
 <div id="export-container">
   <div class="header-group">
-    <h3 class="title">{pluginInstance.i18n.export.title} - {getCurrentPlatformName()}</h3>
+    <h3 class="title">
+      {pluginInstance.i18n.export.title} -
+      {platforms.find((p) => p.id === $exportConfig.platform)?.name}
+    </h3>
     <div class="divider" />
   </div>
 
   <div class="form-group">
     <div class="form-row">
       <label class="label">{pluginInstance.i18n.export.selectNotebook}</label>
-      <select class="select" bind:value={exportConfig.notebook}>
+      <select class="select" bind:value={$exportConfig.notebook}>
         {#each notebooks as notebook}
           <option value={notebook.id}>{notebook.name}</option>
         {/each}
@@ -126,7 +129,7 @@
         <input
           type="text"
           class="input"
-          bind:value={exportConfig.outputFolder}
+          bind:value={$exportConfig.outputFolder}
           placeholder={pluginInstance.i18n.export.outputPathPlaceholder}
         />
         <button class="browse-btn" on:click={handleBrowse}>
@@ -143,17 +146,16 @@
         <div
           class="platform-card"
           data-disabled={platform.disabled}
-          data-selected={exportConfig.platform === platform.id}
-          on:click={() => !platform.disabled && (exportConfig.platform = platform.id)}
+          data-selected={$exportConfig.platform === platform.id}
+          on:click={() => !platform.disabled && exportConfig.update((c) => ({ ...c, platform: platform.id }))}
         >
           <input
             type="radio"
             name="platform"
             value={platform.id}
-            bind:group={exportConfig.platform}
+            bind:group={$exportConfig.platform}
             class="platform-radio"
             disabled={platform.disabled}
-            on:change={() => (exportConfig.platform = platform.id)}
           />
           <span class="platform-content">
             <span class="platform-icon">{platform.icon}</span>
@@ -167,7 +169,7 @@
   <div class="switch-group">
     <div class="switch-item">
       <div class="switch-container">
-        <input type="checkbox" bind:checked={exportConfig.fixTitle} class="switch-input" />
+        <input type="checkbox" bind:checked={$exportConfig.fixTitle} class="switch-input" />
         <span class="slider round" />
       </div>
       <span class="label-text">{pluginInstance.i18n.export.fixTitle}</span>
@@ -175,7 +177,7 @@
 
     <label class="switch-item">
       <div class="switch-container">
-        <input type="checkbox" bind:checked={exportConfig.linkAsPlainText} class="switch-input" />
+        <input type="checkbox" bind:checked={$exportConfig.linkAsPlainText} class="switch-input" />
         <span class="slider round" />
       </div>
       <span class="label-text">{pluginInstance.i18n.export.linkAsPlainText}</span>
@@ -192,11 +194,11 @@
       <div class="advanced-content">
         <div class="form-row">
           <label class="label">{pluginInstance.i18n.export.basePath}</label>
-          <input type="text" class="input" bind:value={exportConfig.basePath} />
+          <input type="text" class="input" bind:value={$exportConfig.basePath} />
         </div>
         <div class="form-row">
           <label class="label">{pluginInstance.i18n.export.assetFolder}</label>
-          <input type="text" class="input" bind:value={exportConfig.assetFolder} />
+          <input type="text" class="input" bind:value={$exportConfig.assetFolder} />
         </div>
       </div>
     {/if}
