@@ -1,8 +1,20 @@
 <!-- insertion marker -->
 <a name="v0.0.3"></a>
 
-## [0.1.0](https://github.com/terwer/siyuan-plugin-custom-slug/compare/v0.0.3...v0.1.0) (2023-06-01)
+## 1.0.0 (2025-03-03)
 ### Features
+* add default renderer ([866c764](https://github.com/terwer/siyuan-plugin-2md/commit/866c764657b5063dd2b10695532652155e7cafe6))
+* add render options ([f30757e](https://github.com/terwer/siyuan-plugin-2md/commit/f30757e3a9b7aeeb44253f96a3ac9bc9fe86f03d))
+* export ui ([d779ea1](https://github.com/terwer/siyuan-plugin-2md/commit/d779ea14227453b86b262100d3c076f5602db278))
+* markdown 批量转换第一版 ([a3de3be](https://github.com/terwer/siyuan-plugin-2md/commit/a3de3beb44476c5102287ff0e0628c9dacec0e58))
+* support assets and links ([e662070](https://github.com/terwer/siyuan-plugin-2md/commit/e662070044f67aad00ef5f0700b4e781ea6e56fb))
+* update deps ([23defc0](https://github.com/terwer/siyuan-plugin-2md/commit/23defc0519ec4a0a64e92e3b487fdda631663b99))
+* 导出到 vuepress ([9f1b4eb](https://github.com/terwer/siyuan-plugin-2md/commit/9f1b4eb2300060d502b73199491194717624f7d8))
+* 支持导出目录 ([7087b6b](https://github.com/terwer/siyuan-plugin-2md/commit/7087b6b8c89bc4370dd6a1f2a1176b2c5f0e1574))
+* 适配 frontformatter ([8477bf3](https://github.com/terwer/siyuan-plugin-2md/commit/8477bf3aae8b74443c1d56137e6f6bac0a1244fd))
+### Miscellaneous
+* 优化打包脚本 ([7e12fe6](https://github.com/terwer/siyuan-plugin-2md/commit/7e12fe65c410281597abe66e1032eb4e794271bd))
+## [0.1.0](https://github.com/terwer/siyuan-plugin-custom-slug/compare/v0.0.3...v0.1.0) (2023-06-01)
 * 刚刚闹了个乌龙，重新打包一次 ([6c4d62b](https://github.com/terwer/siyuan-plugin-custom-slug/commit/6c4d62bb00e34f3e568bb789bb70aefc75af939f))
 * 提供友好的错误提示 ([3358ff0](https://github.com/terwer/siyuan-plugin-custom-slug/commit/3358ff049125fb6bea01191896cc83f03e22db55))
 * 支持重命名文档标题的时候自动生成别名 ([b3ceab4](https://github.com/terwer/siyuan-plugin-custom-slug/commit/b3ceab4e7dcba0a8df5103abc4a838943e824279))
