@@ -26,6 +26,7 @@
 import BaseMarkdownRenderer from "./baseMarkdownRenderer"
 import { SiyuanDevice } from "zhi-device"
 import { isDev } from "../Constants"
+import RenderOptions from "./renderOptions";
 
 /**
  * Markdown渲染器
@@ -34,25 +35,28 @@ import { isDev } from "../Constants"
  * @since 1.0.0
  */
 class VuepressRenderer extends BaseMarkdownRenderer {
-  protected async initConfig(): Promise<void> {
-    await super.initConfig()
-    this.notebook = "20210808180117-czj9bvb"
+  protected async initConfig(opts: RenderOptions): Promise<void> {
+    await super.initConfig(opts)
+    const notebook = "20210808180117-czj9bvb"
     const workspaceFolder = SiyuanDevice.siyuanWorkspacePath()
-    this.outputFolder = SiyuanDevice.joinPath(workspaceFolder, "temp", "siyuan2md", "vuepress")
+    const outputFolder = SiyuanDevice.joinPath(workspaceFolder, "temp", "siyuan2md", "vuepress")
+    opts.notebook = notebook
+    opts.outputFolder = outputFolder
     if (isDev) {
-      this.outputFolder = "/Users/terwer/Downloads/vuepress-demo/docs"
+      opts.notebook = "20231011174146-kexkngw"
+      opts.outputFolder = "/Users/terwer/Downloads/vuepress-demo/docs"
     }
-    this.logger.info(`vuepress outputFolder => ${this.outputFolder}`)
+    this.logger.info(`vuepress outputFolder => ${opts.outputFolder}`)
   }
 
   protected async renderMd() {
     this.logger.info("render md to vuepress")
     const fs = SiyuanDevice.requireLib("fs")
     const path = SiyuanDevice.requireLib("path")
-    if (!fs.existsSync(this.outputFolder)) {
-      fs.mkdirSync(this.outputFolder, { recursive: true })
+    if (!fs.existsSync(this.opts.outputFolder)) {
+      fs.mkdirSync(this.opts.outputFolder, { recursive: true })
     }
-    const ret: any = await this.getAllFileList(this.notebook, "")
+    const ret: any = await this.getAllFileList(this.opts.notebook, "")
     const files = ret.ret
     const nameMap = ret.nameMap
     this.logger.info(`Found ${files.length} files.`, files)
@@ -63,7 +67,7 @@ class VuepressRenderer extends BaseMarkdownRenderer {
       const paths = file.path.replace(/\.sy/, "").split("/")
       this.logger.debug("paths =>", paths)
 
-      const first_dir = path.join(this.outputFolder, "000.目录页")
+      const first_dir = path.join(this.opts.outputFolder, "000.目录页")
       let first_file: string
       let first_file_name: string
       let first_file_slug: string
@@ -80,14 +84,14 @@ class VuepressRenderer extends BaseMarkdownRenderer {
         // first_file_slug = dir_arr[0]
         first_file_slug = "test" + i
         first_file = path.join(first_dir, dir_arr[0] + ".md")
-        save_dir = path.join(this.outputFolder, toDir)
+        save_dir = path.join(this.opts.outputFolder, toDir)
         save_file = path.join(save_dir, "README.md")
         this.logger.debug("生成目录 => ", save_dir)
         this.logger.debug("一级目录目录 => ", first_dir)
         this.logger.debug("一级目录目录文件 => ", first_file)
         this.logger.debug("生成目录文件 => ", save_file)
       } else {
-        const toFile = path.join(this.outputFolder, toDir + ".md")
+        const toFile = path.join(this.opts.outputFolder, toDir + ".md")
         save_dir = path.dirname(toFile)
         save_file = toFile
         this.logger.debug("复用文档目录 => ", save_dir)
@@ -127,12 +131,9 @@ author:
   name: terwer
   link: https://github.com/terwer
 ---`
-      const mdRes = await this.kernelApi.exportMdContent(pageId)
-      if (mdRes.code !== 0) {
-        throw new Error(mdRes.msg)
-      }
-      const mdResData = mdRes.data as any
-      const md = mdFM + "\n" + mdResData.content
+      // 渲染单个 MD（核心方法）
+      const mdContent = await this.renderSingleDoc(pageId)
+      const md = mdFM + "\n" + mdContent
       // this.logger.info("save_dir=", { toPath: save_dir })
       // this.logger.info("md=>", { md: md })
       const fsPromise = SiyuanDevice.requireLib("fs").promises

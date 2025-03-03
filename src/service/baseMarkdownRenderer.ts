@@ -29,6 +29,7 @@ import ExportMdPlugin from "../index"
 import { SiyuanDevice } from "zhi-device"
 import KernelApi from "../api/kernel-api"
 import { HtmlUtil } from "zhi-common"
+import RenderOptions from "./renderOptions"
 
 /**
  * Markdown渲染器
@@ -39,25 +40,32 @@ import { HtmlUtil } from "zhi-common"
 class BaseMarkdownRenderer {
   protected readonly logger: ILogger
   protected readonly kernelApi: KernelApi
-  protected notebook: string
-  protected outputFolder: string
+  protected readonly opts: RenderOptions
 
   constructor(pluginInstance: ExportMdPlugin) {
     this.logger = simpleLogger("base-markdown-renderer", "export-md", isDev)
     this.kernelApi = new KernelApi()
 
     // 默认是思源笔记用户指南
-    this.notebook = "20210808180117-czj9bvb"
+    const notebook = "20210808180117-czj9bvb"
     const workspaceFolder = SiyuanDevice.siyuanWorkspacePath()
-    this.outputFolder = SiyuanDevice.joinPath(workspaceFolder, "temp", "siyuan2md", "default")
-    this.logger.info(`default outputFolder => ${this.outputFolder}`)
+    const outputFolder = SiyuanDevice.joinPath(workspaceFolder, "temp", "siyuan2md", "default")
+    const opts = new RenderOptions()
+    opts.notebook = notebook
+    opts.outputFolder = outputFolder
+    opts.basePath = "/"
+    opts.assetFolder = "assets"
+    opts.fixTitle = false
+    opts.linkAsPlainText = false
+    this.opts = opts
+    this.logger.info(`default outputFolder => ${this.opts.outputFolder}`)
   }
 
   /**
    * 执行渲染入口
    */
   public async doRender() {
-    await this.initConfig()
+    await this.initConfig(this.opts)
     return await this.renderMd()
   }
 
@@ -66,7 +74,7 @@ class BaseMarkdownRenderer {
    *
    * @protected
    */
-  protected async initConfig() {}
+  protected async initConfig(opts: RenderOptions) {}
 
   protected async renderSingleDoc(pageId: string) {
     const mdRes = await this.kernelApi.exportMdContent(pageId)
@@ -88,10 +96,10 @@ class BaseMarkdownRenderer {
   protected async renderMd() {
     const fs = SiyuanDevice.requireLib("fs")
     const path = SiyuanDevice.requireLib("path")
-    if (!fs.existsSync(this.outputFolder)) {
-      fs.mkdirSync(this.outputFolder, { recursive: true })
+    if (!fs.existsSync(this.opts.outputFolder)) {
+      fs.mkdirSync(this.opts.outputFolder, { recursive: true })
     }
-    const ret: any = await this.getAllFileList(this.notebook, "")
+    const ret: any = await this.getAllFileList(this.opts.notebook, "")
     const files = ret.ret
     const nameMap = ret.nameMap
     this.logger.info(`Found ${files.length} files.`, files)
@@ -110,12 +118,12 @@ class BaseMarkdownRenderer {
       })
       const toDir = path.join(...dir_arr)
       if (file.subFileCount > 0) {
-        save_dir = path.join(this.outputFolder, toDir)
+        save_dir = path.join(this.opts.outputFolder, toDir)
         save_file = path.join(save_dir, "README.md")
         this.logger.debug("生成目录 => ", save_dir)
         this.logger.debug("生成目录文件 => ", save_file)
       } else {
-        const toFile = path.join(this.outputFolder, toDir + ".md")
+        const toFile = path.join(this.opts.outputFolder, toDir + ".md")
         save_dir = path.dirname(toFile)
         save_file = toFile
         this.logger.debug("复用文档目录 => ", save_dir)
@@ -276,17 +284,11 @@ class BaseMarkdownRenderer {
   }
 
   private async downloadAsset(originalPath: string, fileExt: string, isRemote = false): Promise<string> {
-    // 偏好设置 ==========================================================
-    const mkDocsAssetFolder = "/assets"
-    // const mkDocsBasePath = "/docs"
-    const mkDocsBasePath = ""
-    // 偏好设置 ==========================================================
-
     const fs = SiyuanDevice.requireLib("fs").promises
     const path = SiyuanDevice.requireLib("path")
 
     // 统一资源输出目录
-    const assetOutputDir = SiyuanDevice.joinPath(this.outputFolder, mkDocsAssetFolder)
+    const assetOutputDir = SiyuanDevice.joinPath(this.opts.outputFolder, this.opts.assetFolder)
     await fs.mkdir(assetOutputDir, { recursive: true })
 
     // 生成目标文件名（保留原始文件名+哈希后缀）
@@ -324,7 +326,7 @@ class BaseMarkdownRenderer {
 
     // 获取绝对路径
     let assetBaseFolder = SiyuanDevice.siyuanDataPath()
-    if (defaultNotebook === this.notebook) {
+    if (defaultNotebook === this.opts.notebook) {
       // 20210808180117-czj9bvb
       assetBaseFolder = SiyuanDevice.joinPath(assetBaseFolder, defaultNotebook)
     }
@@ -368,7 +370,7 @@ class BaseMarkdownRenderer {
       }
 
       // 返回相对路径
-      return path.relative(this.outputFolder, targetPath)
+      return path.relative(this.opts.outputFolder, targetPath)
     } catch (err) {
       this.logger.error(`远程资源下载失败：${url}`, err)
       throw err
@@ -413,16 +415,6 @@ class BaseMarkdownRenderer {
   }
 
   private async processLinks(md: any) {
-    // 偏好设置 ==========================================================
-    // 是否移除标题序号
-    const fixTitle = false
-    // 链接是否忽略，展示为纯文本
-    const linkAsPlainText = false
-    // 文档跟根路径
-    // const mkDocsBasePath = "/docs"
-    const mkDocsBasePath = ""
-    // 偏好设置 ==========================================================
-
     // 链接处理
     const outerLinkRegex = /\[(.+?)]\(siyuan:\/\/blocks\/(\d+-\w+)\)/g
     const matches = Array.from(md.matchAll(outerLinkRegex))
@@ -435,13 +427,13 @@ class BaseMarkdownRenderer {
       const [fullMatch, title, id] = match
       // processedTitle
       let processedTitle = title
-      if (fixTitle) {
+      if (this.opts.fixTitle) {
         processedTitle = HtmlUtil.removeTitleNumber(processedTitle)
       }
       // outerLink
       let outerLink = ""
       // 获取预览链接
-      if (linkAsPlainText) {
+      if (this.opts.linkAsPlainText) {
         // 配置了忽略块链接的直接用纯文本
         // https://github.com/terwer/siyuan-plugin-publisher/issues/1202#issuecomment-2542653498
         // outerLink = `siyuan://blocks/${id}`
@@ -458,7 +450,7 @@ class BaseMarkdownRenderer {
             } else if (!hPathRes.data || hPathRes.data.toString().length === 0) {
               this.logger.error("获取文档路径失败：", hPathRes)
             } else {
-              outerLink = SiyuanDevice.joinPath(mkDocsBasePath, hPathRes.data as unknown as string)
+              outerLink = SiyuanDevice.joinPath(this.opts.basePath, hPathRes.data as unknown as string)
               replacedText = replacedText.replace(fullMatch, `[${processedTitle}](${outerLink})`)
             }
           } catch (e) {

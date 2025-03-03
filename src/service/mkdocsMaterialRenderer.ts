@@ -2,6 +2,7 @@ import BaseMarkdownRenderer from "./baseMarkdownRenderer"
 import ExportMdPlugin from "../index"
 import { SiyuanDevice } from "zhi-device"
 import { isDev } from "../Constants"
+import RenderOptions from "./renderOptions"
 
 /**
  * Markdown渲染器
@@ -14,16 +15,18 @@ class MkdocsMaterialRenderer extends BaseMarkdownRenderer {
     super(pluginInstance)
   }
 
-  protected async initConfig(): Promise<void> {
-    await super.initConfig()
-    this.notebook = "20210808180117-czj9bvb"
+  protected async initConfig(opts: RenderOptions): Promise<void> {
+    await super.initConfig(opts)
+    const notebook = "20210808180117-czj9bvb"
     const workspaceFolder = SiyuanDevice.siyuanWorkspacePath()
-    this.outputFolder = SiyuanDevice.joinPath(workspaceFolder, "temp", "siyuan2md", "mkdocs-material")
+    const outputFolder = SiyuanDevice.joinPath(workspaceFolder, "temp", "siyuan2md", "mkdocs-material")
+    opts.notebook = notebook
+    opts.outputFolder = outputFolder
     if (isDev) {
-      this.notebook = "20231011174146-kexkngw"
-      this.outputFolder = "/Volumes/workspace/mydocs/other-projects/mkdocs-demo/demo/docs"
+      opts.notebook = "20231011174146-kexkngw"
+      opts.outputFolder = "/Volumes/workspace/mydocs/other-projects/mkdocs-demo/demo/docs"
     }
-    this.logger.info(`mkdocs-material outputFolder => ${this.outputFolder}`)
+    this.logger.info(`mkdocs-material outputFolder => ${opts.outputFolder}`)
   }
 
   public async renderMd() {
