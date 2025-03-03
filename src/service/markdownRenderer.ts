@@ -53,7 +53,7 @@ class MarkdownRenderer {
     // 正式
     // this.notebook = "20220712031439-h4ut7wc"
     // this.outputFolder = "/Users/terwer/Downloads/siyuan2md/default"
-    this.outputFolder = "/Users/terwer/Documents/mydocs/terwer.github.io/docs"
+    this.outputFolder = "/Users/terwer/Downloads/dev/terwer.github.io/docs"
     // const appDataFolder = this.common.electronUtil.getCrossPlatformAppDataFolder()
     // this.outputFolder = this.common.electronUtil.joinPath(appDataFolder, "siyuan2md", "default")
   }

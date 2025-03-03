@@ -51,6 +51,13 @@ class VuepressRenderer extends MarkdownRenderer {
       const paths = file.path.replace(/\.sy/, "").split("/")
       this.logger.debug("paths =>", paths)
 
+      const first_dir = path.join(this.outputFolder, "000.目录页")
+      let first_file: string
+      let first_file_name: string
+      let first_file_slug: string
+
+
+
       let save_dir: string
       let save_file: string
       const dir_arr = []
@@ -59,9 +66,15 @@ class VuepressRenderer extends MarkdownRenderer {
       })
       const toDir = path.join(...dir_arr)
       if (file.subFileCount > 0) {
+        first_file_name = dir_arr[0]
+        // first_file_slug = dir_arr[0]
+        first_file_slug = "test" + i
+        first_file = path.join(first_dir, dir_arr[0] + ".md")
         save_dir = path.join(this.outputFolder, toDir)
         save_file = path.join(save_dir, "README.md")
         this.logger.debug("生成目录 => ", save_dir)
+        this.logger.debug("一级目录目录 => ", first_dir)
+        this.logger.debug("一级目录目录文件 => ", first_file)
         this.logger.debug("生成目录文件 => ", save_file)
       } else {
         const toFile = path.join(this.outputFolder, toDir + ".md")
@@ -75,17 +88,67 @@ class VuepressRenderer extends MarkdownRenderer {
         fs.mkdirSync(save_dir)
       }
 
+      // 确保有目录
+      if (!fs.existsSync(first_dir)) {
+        fs.mkdirSync(first_dir)
+      }
+
+      // md正文
+      const mdFM = `---
+title: Java_SE之Java_SE平台与JDK
+date: 2022-09-05 12:20:12
+permalink: /post/java-se-platform-and-jdk.html
+meta:
+  - name: keywords
+    content: 平台 版本 jdk javase java kotlin
+  - name: description
+    content: >-
+      java平台javase_javaplatformstandardeditionjavase是一个计算平台用于为桌面和服务器环境开发和部署可移植代码。javase以前称为javaplatformstandardedition(jse)。javame_javaplatformmicroeditionjavame是一个计算平台用于为嵌入式和移动设备（微控制器传感器网关移动电话个人数字助理电视机顶盒打印机）开发和部署可移植代码。javame以前称为javaplatformmicroedition或jme。截至年
+categories:
+  - 默认分类
+tags:
+  - 平台
+  - 版本
+  - jdk
+  - javase
+  - java
+  - kotlin
+author:
+  name: terwer
+  link: https://github.com/terwer
+---`
       const mdRes = await this.kernelApi.exportMdContent(pageId)
       if (mdRes.code !== 0) {
         throw new Error(mdRes.msg)
       }
       const mdResData = mdRes.data as any
-      const md = mdResData.content
-
+      const md = mdFM + "\n" + mdResData.content
       // this.logger.info("save_dir=", { toPath: save_dir })
       // this.logger.info("md=>", { md: md })
       const fsPromise = SiyuanDevice.requireLib("fs").promises
       await fsPromise.writeFile(save_file, md, { encoding: "utf8" })
+
+      // 目录正文
+      if (first_file) {
+        const dirMd = `---
+pageComponent:
+  name: Catalogue
+  data:
+    path: ${first_file_name}
+    imgUrl: /img/web.png
+    description: 服务端技术分享
+title: ${first_file_name}
+date: 2011-03-11 21:50:53
+permalink: /${first_file_slug}/
+article: false
+comment: false
+editLink: false
+author:
+  name: terwer
+  link: https://github.com/terwer
+---`
+        await fsPromise.writeFile(first_file, dirMd, { encoding: "utf8" })
+      }
     }
 
     return files.length

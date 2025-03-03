@@ -1,13 +1,14 @@
 {
-  "name": "siyuan-plugin-custom-slug",
+  "name": "siyuan-plugin-2md",
   "version": "0.1.0",
   "type": "module",
-  "description": "I heard give me a new name, it will be easier for you to find me",
-  "repository": "terwer/siyuan-plugin-custom-slug",
-  "homepage": "https://github.com/terwer/siyuan-plugin-custom-slug",
+  "description": "Batch convert the documents of Siyuan Notes into Markdown files, and support the conversion properties of FrontFormatter corresponding to Hexo, Hugo, Vitepress, Obsidian and other platforms",
+  "repository": "terwer/siyuan-plugin-2md",
+  "homepage": "https://github.com/terwer/siyuan-plugin-2md",
   "author": "terwer",
   "license": "GPL-3.0",
   "scripts": {
+    "makeLink": "python scripts/make_dev_link.py",
     "serve": "vite",
     "dev": "vite build --watch",
     "build": "vite build",
@@ -41,5 +42,6 @@
     "zhi-common": "^1.8.2",
     "zhi-device": "^1.0.1",
     "zhi-lib-base": "^0.1.0"
-  }
+  },
+  "packageManager": "pnpm@9.15.1+sha512.1acb565e6193efbebda772702950469150cf12bcc764262e7587e71d19dc98a423dff9536e57ea44c49bdf790ff694e83c27be5faa23d67e0c033b583be4bfcf"
 }

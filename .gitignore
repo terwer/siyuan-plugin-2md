@@ -5,3 +5,5 @@ node_modules
 dist
 build
 __pycache__
+cookie.txt
+token.txt
