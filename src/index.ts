@@ -30,7 +30,7 @@ import { simpleLogger } from "zhi-lib-base"
 import { isDev } from "./Constants"
 
 import "./index.styl"
-import MarkdownRenderer from "./service/markdownRenderer"
+import BaseMarkdownRenderer from "./service/baseMarkdownRenderer"
 
 /**
  * 别名插件

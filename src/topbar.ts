@@ -26,6 +26,7 @@
 import ExportMdPlugin from "./index"
 import { icons } from "./utils/svg"
 import VuepressRenderer from "./service/vuepressRenderer"
+import DefaultRenderer from "./service/defaultRenderer";
 
 /**
  * 顶栏按钮
@@ -47,7 +48,8 @@ export async function initTopbar(pluginInstance: ExportMdPlugin) {
     pluginInstance.logger.info("Start syncing markdown files ...")
     const startTime = Date.now()
 
-    const markdownRender = new VuepressRenderer(pluginInstance)
+    const markdownRender = new DefaultRenderer(pluginInstance)
+    // const markdownRender = new VuepressRenderer(pluginInstance)
     const count = await markdownRender.renderMd()
 
     pluginInstance.logger.info(`Synced (${count}) markdown files.`)
