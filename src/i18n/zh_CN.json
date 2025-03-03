@@ -1,5 +1,7 @@
 {
   "cancel": "取消",
   "save": "保存",
-  "exportMd": "Markdown批量转换"
+  "exportMd": "Markdown批量转换",
+  "export": {
+  }
 }

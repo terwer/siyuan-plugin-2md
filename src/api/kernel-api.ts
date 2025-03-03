@@ -55,6 +55,14 @@ class KernelApi extends BaseApi {
     const url = "/api/filetree/getHPathByID"
     return await this.siyuanRequest(url, data)
   }
+
+  public async lsNotebooks(): Promise<SiyuanData> {
+    const data = {
+      flashcard: false,
+    }
+    const url = "/api/notebook/lsNotebooks"
+    return await this.siyuanRequest(url, data)
+  }
 }
 
 export default KernelApi
