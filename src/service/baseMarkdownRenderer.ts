@@ -28,7 +28,7 @@ import { isDev } from "../Constants"
 import ExportMdPlugin from "../index"
 import { SiyuanDevice } from "zhi-device"
 import KernelApi from "../api/kernel-api"
-import { StrUtil, ZhiCommon } from "zhi-common"
+import { ZhiCommon } from "zhi-common"
 
 /**
  * Markdown渲染器
@@ -36,7 +36,7 @@ import { StrUtil, ZhiCommon } from "zhi-common"
  * @author terwer
  * @since 1.0.0
  */
-class MarkdownRenderer {
+class BaseMarkdownRenderer {
   protected readonly logger
   protected readonly kernelApi: KernelApi
   private readonly common
@@ -44,7 +44,7 @@ class MarkdownRenderer {
   protected readonly outputFolder
 
   constructor(pluginInstance: ExportMdPlugin) {
-    this.logger = simpleLogger("markdown-renderer", "export-md", isDev)
+    this.logger = simpleLogger("base-markdown-renderer", "export-md", isDev)
 
     this.kernelApi = new KernelApi()
     this.common = new ZhiCommon()
@@ -53,9 +53,9 @@ class MarkdownRenderer {
     // 正式
     // this.notebook = "20220712031439-h4ut7wc"
     // this.outputFolder = "/Users/terwer/Downloads/siyuan2md/default"
-    this.outputFolder = "/Users/terwer/Downloads/dev/terwer.github.io/docs"
-    // const appDataFolder = this.common.electronUtil.getCrossPlatformAppDataFolder()
-    // this.outputFolder = this.common.electronUtil.joinPath(appDataFolder, "siyuan2md", "default")
+    const appDataFolder = SiyuanDevice.homeFolder()
+    this.outputFolder = SiyuanDevice.joinPath(appDataFolder, "siyuan2md", "default")
+    this.logger.info(`default outputFolder => ${this.outputFolder}`)
   }
 
   /**
@@ -176,4 +176,4 @@ class MarkdownRenderer {
   }
 }
 
-export default MarkdownRenderer
+export default BaseMarkdownRenderer

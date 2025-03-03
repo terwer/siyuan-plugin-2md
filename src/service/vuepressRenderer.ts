@@ -23,7 +23,7 @@
  * questions.
  */
 
-import MarkdownRenderer from "./markdownRenderer"
+import BaseMarkdownRenderer from "./baseMarkdownRenderer"
 import { SiyuanDevice } from "zhi-device"
 
 /**
@@ -32,7 +32,7 @@ import { SiyuanDevice } from "zhi-device"
  * @author terwer
  * @since 1.0.0
  */
-class VuepressRenderer extends MarkdownRenderer {
+class VuepressRenderer extends BaseMarkdownRenderer {
   public async renderMd() {
     this.logger.info("render md to vuepress")
     const fs = SiyuanDevice.requireLib("fs")
