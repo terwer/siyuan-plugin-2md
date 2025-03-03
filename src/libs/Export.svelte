@@ -18,39 +18,29 @@
   }
 
   let notebooks = []
-  // 平台选项数据（使用枚举）
+  // 平台选项数据（增加disabled属性）
   const platforms = [
-    { id: PlatformType.HEXO, name: "Hexo", icon: "🌍" },
-    { id: PlatformType.HUGO, name: "Hugo", icon: "⚡" },
-    { id: PlatformType.MKDOCS, name: "MkDocs", icon: "📘" },
-    { id: PlatformType.VITEPRESS, name: "VitePress", icon: "🚀" },
-    { id: PlatformType.DEFAULT, name: "Default", icon: "📁" },
+    { id: PlatformType.DEFAULT, name: "通用MD", icon: "📁", disabled: false },
+    { id: PlatformType.MKDOCS, name: "MkDocs", icon: "📘", disabled: false },
+    { id: PlatformType.HEXO, name: "Hexo", icon: "🌍", disabled: true },
+    { id: PlatformType.HUGO, name: "Hugo", icon: "⚡", disabled: true },
+    { id: PlatformType.VITEPRESS, name: "VitePress", icon: "🚀", disabled: true },
   ]
-  let isAdvancedOpen = false // 高级设置展开状态
+  let isAdvancedOpen = false
   let isExporting = false
 
-  // 处理文件夹选择
-  const handleBrowse = async () => {
-    // const path = await pluginInstance.showFolderDialog()
-    // if (path) exportConfig.outputFolder = path
-  }
+  const handleBrowse = async () => {}
 
   const handleExport = async () => {
     switch (exportConfig.platform) {
       case PlatformType.HEXO:
-        // Hexo专用处理逻辑
         break
       case PlatformType.HUGO:
-        // Hugo专用处理逻辑
         break
-      // ...其他平台处理
     }
   }
 
-  // lifecycle
   onMount(async () => {
-    // 读取配置
-    // 读取笔记本
     const res = await pluginInstance.kernelApi.lsNotebooks()
     notebooks = (res?.data as any)?.notebooks ?? []
     if (StrUtil.isEmptyString(exportConfig.notebook)) {
@@ -60,15 +50,12 @@
 </script>
 
 <div id="export-container">
-  <!-- 紧凑型标题 -->
   <div class="header-group">
     <h3 class="title">{pluginInstance.i18n.export.title}</h3>
     <div class="divider" />
   </div>
 
-  <!-- 基础设置 -->
   <div class="form-group">
-    <!-- 笔记本选择 -->
     <div class="form-row">
       <label class="label">{pluginInstance.i18n.export.selectNotebook}</label>
       <select class="select" bind:value={exportConfig.notebook}>
@@ -78,7 +65,6 @@
       </select>
     </div>
 
-    <!-- 导出路径 -->
     <div class="form-row">
       <label class="label">{pluginInstance.i18n.export.outputPath}</label>
       <div class="path-input-group">
@@ -95,29 +81,32 @@
     </div>
   </div>
 
-  <!-- 新增平台选择 -->
   <div class="platform-group">
     <label class="section-label">{pluginInstance.i18n.export.selectPlatform}</label>
     <div class="platform-options">
       {#each platforms as platform}
-        <label class="platform-card" data-selected={exportConfig.platform === platform.id}>
+        <div
+          class="platform-card"
+          data-disabled={platform.disabled}
+          data-selected={exportConfig.platform === platform.id}
+        >
           <input
             type="radio"
             name="platform"
             value={platform.id}
             bind:group={exportConfig.platform}
             class="platform-radio"
+            disabled={platform.disabled}
           />
-          <div class="platform-content">
+          <span class="platform-content">
             <span class="platform-icon">{platform.icon}</span>
             <span class="platform-name">{platform.name}</span>
-          </div>
-        </label>
+          </span>
+        </div>
       {/each}
     </div>
   </div>
 
-  <!-- 开关选项 -->
   <div class="switch-group">
     <label class="switch-item">
       <div class="switch-container">
@@ -136,7 +125,6 @@
     </label>
   </div>
 
-  <!-- 可折叠高级设置 -->
   <div class="advanced-group">
     <div class="toggle-header" on:click={() => (isAdvancedOpen = !isAdvancedOpen)}>
       <span class="toggle-icon">{isAdvancedOpen ? "▼" : "▶"}</span>
@@ -157,14 +145,12 @@
     {/if}
   </div>
 
-  <!-- 导出按钮 -->
   <button class="export-btn" on:click={handleExport}>
     {pluginInstance.i18n.export.exportButton}
   </button>
 </div>
 
 <style lang="stylus">
-  // 基础样式
   #export-container
     width: 480px
     padding: 16px
@@ -188,62 +174,80 @@
     display: flex
     gap: 8px
 
-  /* 新增平台组件样式 */
   .platform-group {
-    margin: 20px 0;
+    margin: 12px 0;
     padding: 0;
 
     .section-label {
       display: block;
-      margin-bottom: 16px;
-      font-size: 14px;
+      margin-bottom: 12px;
+      font-size: 13px;
       font-weight: 500;
       color: #4a4a4a;
     }
 
     .platform-options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     }
 
     .platform-card {
-      flex: 1 1 160px;
-      min-height: 80px;
+      min-height: 32px;
       border: 1px solid #e3e8ef;
-      border-radius: 8px;
-      padding: 16px;
+      border-radius: 6px;
+      padding: 8px;
       background: #f8fafc;
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
+      transition: all 0.2s ease;
+      min-width: 0;
 
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-        background: #f1f5f9;
+      &[data-disabled="true"] {
+        pointer-events: none;
+        opacity: 0.6;
+        background: #f5f5f5;
+        border-color: #e0e0e0;
+
+        .platform-icon, .platform-name {
+          opacity: 0.7;
+        }
+      }
+
+      &:not([data-disabled="true"]):hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
       }
 
       &[data-selected="true"] {
-        border-color: #3b82f6;
+        border: 2px solid #3b82f6;
         background: #eff6ff;
-        box-shadow: inset 0 0 0 1px #3b82f6;
+        animation: card-selected 0.3s ease;
 
         &::after {
           content: "✓";
           position: absolute;
-          right: 8px;
-          top: 8px;
+          right: 4px;
+          top: 4px;
           color: #3b82f6;
-          font-size: 14px;
+          font-size: 12px;
           background: rgba(255, 255, 255, 0.9);
-          width: 20px;
-          height: 20px;
+          width: 16px;
+          height: 16px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
+        }
+
+        &[data-disabled="true"] {
+          background: #f0f0f0;
+          border-color: #d9d9d9;
+          &::after {
+            color: #999;
+            background: rgba(255,255,255,0.7);
+          }
         }
       }
     }
@@ -251,35 +255,37 @@
     .platform-radio {
       position: absolute;
       opacity: 0;
-      width: 0;
-      height: 0;
     }
 
     .platform-content {
-      display: flex;
-      flex-direction: column;
+      display: inline-flex;
+      flex-direction: row;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
+      justify-content: center;
     }
 
     .platform-icon {
-      font-size: 28px;
-      line-height: 1;
+      font-size: 20px;
     }
 
     .platform-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: #1e293b;
-      letter-spacing: 0.5px;
+      font-size: 12px;
+      white-space: nowrap;
+      color: #333;
     }
   }
 
-  // 开关组件样式
+  @keyframes card-selected {
+    0% { transform: scale(0.98); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+
   .switch-group
     display: flex
-    flex-direction: column
-    gap: 12px
+    flex-direction: row
+    gap: 32px
     margin: 12px 0
     padding: 12px 0
     border-top: 1px solid #eee
@@ -336,7 +342,6 @@
     font-size: 14px
     color: #333
 
-  // 高级设置
   .advanced-group
     margin: 12px 0
 
@@ -354,7 +359,6 @@
     background: #f8f9fa
     border-radius: 4px
 
-  // 导出按钮
   .export-btn
     width: 100%
     margin-top: 16px
@@ -369,12 +373,10 @@
     &:hover
       background: #0069d9
 
-  // 输入框样式
   .input, .select
     background: #fff
     border: 1px solid #ddd
 
-  // 暗黑模式全局适配
   :global(html[data-theme-mode="dark"]) {
     #export-container {
       background: #2a2a2a;
@@ -432,8 +434,15 @@
         border-color: #334155;
         background: #1e293b;
 
-        &:hover {
-          background: #2d3748;
+        &[data-disabled="true"] {
+          background: #404040;
+          border-color: #555;
+          color: #888;
+
+          &[data-selected="true"] {
+            background: #4a4a4a;
+            border-color: #666;
+          }
         }
 
         &[data-selected="true"] {
