@@ -12,7 +12,9 @@
 
   export let pluginInstance: ExportMdPlugin
   const exportService = new ExportService(pluginInstance)
-  const CONFIG_PRESET = "export-preset.json"
+  const PRESET_KEY = "export-presets.json"
+  const presets = writable({} as Record<string, any>)
+  let selectedPreset = ""
 
   // 导出配置数据（改为响应式存储）
   const exportConfig = writable({
@@ -45,6 +47,8 @@
   let isAdvancedOpen = false
   let isExporting = false
   let docInfo = undefined
+  let showPresetDialog = false
+  let presetNameInput = ""
 
   const handleBrowse = async () => {
     const mainWin = SiyuanDevice.siyuanWindow()
@@ -128,11 +132,70 @@
   }
 
   const handleSavePreset = async () => {
+    showPresetDialog = true
+    presetNameInput = "" // 重置输入
+  }
+
+  // 处理确认保存
+  const handlePresetConfirm = async () => {
+    if (!presetNameInput.trim()) {
+      showMessage("预设名称不能为空", 3000, "error")
+      return
+    }
+
     const configCopy = JSON.parse(JSON.stringify($exportConfig))
     delete configCopy.outputFolder
-    // 保存到本地存储或插件配置
-    await pluginInstance.saveData(CONFIG_PRESET, configCopy)
-    showMessage("预设保存成功", 3000, "info")
+
+    presets.update((p) => ({
+      ...p,
+      [presetNameInput]: configCopy,
+    }))
+
+    await pluginInstance.saveData(PRESET_KEY, $presets)
+    selectedPreset = presetNameInput
+    showPresetDialog = false
+    showMessage(`预设 "${presetNameInput}" 保存成功`, 3000, "info")
+  }
+
+  // 新增删除方法
+  const handleDeletePreset = async () => {
+    if (!selectedPreset) return
+
+    // 二次确认
+    const confirm = await SiyuanDevice.siyuanWindow()
+      .require("@electron/remote")
+      .dialog.showMessageBox({
+        type: "question",
+        title: "删除预设",
+        message: `确定要删除预设 "${selectedPreset}" 吗？`,
+        buttons: ["取消", "删除"],
+      })
+
+    if (confirm.response !== 1) return
+
+    // 执行删除
+    presets.update((p) => {
+      const newPresets = { ...p }
+      delete newPresets[selectedPreset]
+      return newPresets
+    })
+
+    // 保存数据
+    await pluginInstance.saveData(PRESET_KEY, $presets)
+
+    // 重置选择
+    selectedPreset = ""
+    showMessage(`预设已删除`, 3000, "info")
+  }
+
+  const handlePresetChange = async (event) => {
+    const name = event.target.value
+    if (!name) return
+
+    const preset = $presets[name]
+    if (preset) {
+      exportConfig.update((c) => ({ ...c, ...preset }))
+    }
   }
 
   onMount(async () => {
@@ -159,13 +222,20 @@
       }))
     }
     // 加载预设
-    const preset = await pluginInstance.loadData(CONFIG_PRESET)
-    if (preset) {
+    const savedPresets = (await pluginInstance.loadData(PRESET_KEY)) || {}
+    presets.set(savedPresets)
+    // 加载第一个预设
+    const presetNames = Object.keys(savedPresets)
+    if (presetNames.length > 0) {
+      selectedPreset = presetNames[0]
       exportConfig.update((c) => ({
         ...c,
-        ...preset,
+        ...savedPresets[selectedPreset],
       }))
+    } else {
+      selectedPreset = ""
     }
+    pluginInstance.logger.debug("presets", $presets)
   })
 </script>
 
@@ -173,10 +243,19 @@
   <div class="header-group">
     <h3 class="title">
       {pluginInstance.i18n.export.title} -
-      {platforms.find((p) => p.id === $exportConfig.platform)?.name}
+      <select class="preset-select" bind:value={selectedPreset} on:change={handlePresetChange}>
+        <option value="">默认配置</option>
+        {#each Object.keys($presets) as name}
+          <option value={name}>{name}</option>
+        {/each}
+      </select>
       <span class="save-preset" on:click={handleSavePreset}>
         {pluginInstance.i18n.export.savePreset || "保存预设"}
       </span>
+      <!-- 只在有选中预设时显示删除按钮 -->
+      {#if selectedPreset}
+        <span class="delete-preset" on:click={handleDeletePreset}>🗑️</span>
+      {/if}
     </h3>
     <div class="divider" />
   </div>
@@ -319,9 +398,88 @@
       {pluginInstance.i18n.export.exportButton}
     {/if}
   </button>
+
+  <!-- 弹窗 -->
+  {#if showPresetDialog}
+    <div class="preset-dialog">
+      <div class="dialog-content">
+        <h3>保存预设</h3>
+        <input
+          type="text"
+          bind:value={presetNameInput}
+          placeholder="请输入预设名称"
+          on:keydown={(e) => e.key === "Enter" && handlePresetConfirm()}
+        />
+        <div class="dialog-buttons">
+          <button on:click={handlePresetConfirm}>确定</button>
+          <button on:click={() => (showPresetDialog = false)}>取消</button>
+        </div>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style lang="stylus">
+  // 弹窗样式
+  .preset-dialog
+    position: fixed
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background: rgba(0,0,0,0.5)
+    display: flex
+    justify-content: center
+    align-items: center
+    z-index: 1000
+
+  .dialog-content
+    background: var(--b3-theme-background)
+    padding: 20px
+    border-radius: 8px
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2)
+    width: 300px
+
+    h3
+      margin: 0 0 15px 0
+      font-size: 16px
+
+    input
+      width: 100%
+      padding: 8px
+      margin-bottom: 15px
+      border: 1px solid var(--b3-border-color)
+
+    .dialog-buttons
+      display: flex
+      gap: 10px
+      justify-content: flex-end
+
+      button
+        padding: 6px 12px
+        border-radius: 4px
+        cursor: pointer
+        &:first-child
+          background: #3b82f6
+          color: white
+          border: none
+        &:last-child
+          background: none
+          border: 1px solid var(--b3-border-color)
+
+  .delete-preset
+    font-size 12px
+    margin-left: 8px
+    cursor: pointer
+    opacity: 0.6
+    transition: opacity 0.2s
+    &:hover
+      opacity: 1
+      color: #ef4444
+
+  .preset-select
+    font-size 12px
+
   #export-container
     min-width: 480px
     max-width 100%
