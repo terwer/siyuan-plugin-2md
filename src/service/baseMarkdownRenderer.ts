@@ -28,8 +28,9 @@ import { defaultNotebook, isDev } from "../Constants"
 import ExportMdPlugin from "../index"
 import { SiyuanDevice } from "zhi-device"
 import KernelApi from "../api/kernel-api"
-import { HtmlUtil } from "zhi-common"
+import { HtmlUtil, StrUtil } from "zhi-common"
 import RenderOptions from "../models/renderOptions"
+import ExportMode from "../models/ExportMode"
 
 /**
  * Markdown渲染器
@@ -103,7 +104,7 @@ class BaseMarkdownRenderer {
     if (!fs.existsSync(this.opts.outputFolder)) {
       fs.mkdirSync(this.opts.outputFolder, { recursive: true })
     }
-    const ret: any = await this.getAllFileList(this.opts.notebook, "")
+    const ret: any = await this.getAllFileList("")
     const files = ret.ret
     const nameMap = ret.nameMap
     this.logger.info(`Found ${files.length} files.`, files)
@@ -118,31 +119,50 @@ class BaseMarkdownRenderer {
       let save_file: string
       const dir_arr = []
       paths.forEach((item: string) => {
-        dir_arr.push(nameMap[item])
+        let dir_name = nameMap[item]
+        if (this.opts.fixTitle) {
+          dir_name = HtmlUtil.removeTitleNumber(dir_name)
+        }
+        if (StrUtil.isEmptyString(dir_name)) {
+          return
+        }
+        dir_arr.push(dir_name)
       })
       const toDir = path.join(...dir_arr)
       if (file.subFileCount > 0) {
         save_dir = path.join(this.opts.outputFolder, toDir)
         save_file = path.join(save_dir, "README.md")
         this.logger.debug("生成目录 => ", save_dir)
-        this.logger.debug("生成目录文件 => ", save_file)
       } else {
         const toFile = path.join(this.opts.outputFolder, toDir + ".md")
         save_dir = path.dirname(toFile)
         save_file = toFile
         this.logger.debug("复用文档目录 => ", save_dir)
-        this.logger.debug("生成文档 => ", save_file)
       }
       // 确保有目录
       if (!fs.existsSync(save_dir)) {
         fs.mkdirSync(save_dir)
       }
+      let save_file_name = path.basename(save_file)
+      if (this.opts.fixTitle) {
+        save_file_name = HtmlUtil.removeTitleNumber(save_file_name)
+      }
+      save_file = path.join(save_dir, save_file_name)
+      this.logger.debug("生成文档 => ", save_file)
       // 渲染单个 MD（核心方法）
       const md = await this.renderSingleDoc(pageId)
       // this.logger.info("save_dir=", { toPath: save_dir })
       // this.logger.info("md=>", { md: md })
       const fsPromise = SiyuanDevice.requireLib("fs").promises
       await fsPromise.writeFile(save_file, md, { encoding: "utf8" })
+    }
+    // 生成首页
+    if (!StrUtil.isEmptyString(this.opts.homePageId)) {
+      const md = await this.renderSingleDoc(this.opts.homePageId)
+      const home_save_file = path.join(this.opts.outputFolder, "index.md")
+      const fsPromise = SiyuanDevice.requireLib("fs").promises
+      await fsPromise.writeFile(home_save_file, md, { encoding: "utf8" })
+      this.logger.info("生成首页 => ", home_save_file)
     }
 
     return files.length
@@ -151,11 +171,68 @@ class BaseMarkdownRenderer {
   /**
    * 递归获取该笔记本下面的所有文件
    *
-   * @param notebook 笔记本
    * @param path 路径，根路径传空
    * @private
    */
-  protected async getAllFileList(notebook: string, path: string): Promise<any> {
+  protected async getAllFileList(path: string): Promise<any> {
+    const mode: ExportMode = this.opts.exportMode
+    switch (mode) {
+      case ExportMode.DOCUMENT:
+        this.logger.info(`getAllFileListByRootDocument => ${this.opts.homePageId}`)
+        // 笔记本ID
+        return await this.getAllFileListByRootDocument(this.opts.homePageId, path)
+      default:
+        this.logger.info(`getAllFileListByNotebook => ${this.opts.notebook}`)
+        // 根文档ID
+        return await this.getAllFileListByNotebook(this.opts.notebook, path)
+    }
+  }
+
+  protected async getAllFileListByRootDocument(homePageId: string, path: string): Promise<any> {
+    const that = this
+    const ret: any[] = []
+    const nameMap = {}
+
+    async function recursivelyGetFiles(notebook, path: string, currentPathFiles: any[]): Promise<void> {
+      for (let i = 0; i < currentPathFiles.length; i++) {
+        const file = currentPathFiles[i] as any
+        // 子文件路径
+        const subPath = file.path || ""
+        const subFilesRes = await that.listDocsByPath(notebook, subPath)
+        const subDocs = subFilesRes.data as any
+        const isLeaf = subDocs.files.length === 0
+        nameMap[file.id] = file.name.replace(/\.sy/, "")
+
+        ret.push({ ...file, isLeaf })
+
+        if (!isLeaf) {
+          const subPathFiles = subDocs.files
+          await recursivelyGetFiles(notebook, subPath, subPathFiles)
+        }
+      }
+    }
+
+    // 第一次请求的情况
+    const docRes = await this.getDoc(homePageId)
+    if (docRes.code !== 0) {
+      throw new Error("Unable to fetch docs")
+    }
+    const docInfo = docRes.data as any
+    const notebook = docInfo?.box ?? ""
+    path = docInfo?.path ?? ""
+    const res = await this.listDocsByPath(notebook, path)
+    if (res.code !== 0) {
+      throw new Error("Unable to fetch docs")
+    }
+    const docs = res.data as any
+    const initialFiles = docs.files as []
+
+    await recursivelyGetFiles(notebook, path, initialFiles)
+    this.logger.info("nameMap =>", nameMap)
+    return { ret: ret, nameMap: nameMap }
+  }
+
+  protected async getAllFileListByNotebook(notebook: string, path: string): Promise<any> {
     const that = this
     const ret: any[] = []
     const nameMap = {}
@@ -190,6 +267,10 @@ class BaseMarkdownRenderer {
     await recursivelyGetFiles(path, initialFiles)
     this.logger.info("nameMap =>", nameMap)
     return { ret: ret, nameMap: nameMap }
+  }
+
+  private async getDoc(docId: string) {
+    return await this.kernelApi.getDoc(docId)
   }
 
   /**

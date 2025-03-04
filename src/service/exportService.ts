@@ -2,6 +2,7 @@ import RenderOptions from "../models/renderOptions"
 import PlatformType from "../models/PlatformType"
 import MkdocsMaterialRenderer from "./mkdocsMaterialRenderer"
 import DefaultRenderer from "./defaultRenderer"
+import VuepressRenderer from "./vuepressRenderer"
 
 /**
  * 导出服务
@@ -24,12 +25,18 @@ class ExportService {
         markdownRender = new MkdocsMaterialRenderer(this.pluginInstance)
         break
       }
+      case PlatformType.VUEPRESS: {
+        markdownRender = new VuepressRenderer(this.pluginInstance)
+        break
+      }
       default: {
         markdownRender = new DefaultRenderer(this.pluginInstance)
       }
     }
     const opts = new RenderOptions()
+    opts.exportMode = exportConfig.exportMode
     opts.notebook = exportConfig.notebook
+    opts.homePageId = exportConfig.homePageId
     opts.outputFolder = exportConfig.outputFolder
     opts.basePath = exportConfig.basePath
     opts.assetFolder = exportConfig.assetFolder

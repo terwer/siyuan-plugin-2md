@@ -7,13 +7,20 @@
   import ExportService from "../service/exportService"
   import { showMessage } from "siyuan"
   import { writable } from "svelte/store"
+  import ExportMode from "../models/ExportMode"
+  import PageUtil from "../utils/pageUtil"
 
   export let pluginInstance: ExportMdPlugin
   const exportService = new ExportService(pluginInstance)
+  const PRESET_KEY = "export-presets.json"
+  const presets = writable({} as Record<string, any>)
+  let selectedPreset = ""
 
   // 导出配置数据（改为响应式存储）
   const exportConfig = writable({
+    exportMode: ExportMode.NOTEBOOK,
     notebook: "",
+    homePageId: "",
     outputFolder: "",
     fixTitle: true,
     linkAsPlainText: false,
@@ -23,16 +30,25 @@
   })
 
   let notebooks = []
-  // 平台选项数据（保持原样）
+  // 平台选项数据
   const platforms = [
     { id: PlatformType.DEFAULT, name: "通用MD", icon: "📁", disabled: false },
     { id: PlatformType.MKDOCS, name: "MkDocs", icon: "📘", disabled: false },
     { id: PlatformType.HEXO, name: "Hexo", icon: "🌍", disabled: true },
     { id: PlatformType.HUGO, name: "Hugo", icon: "⚡", disabled: true },
     { id: PlatformType.VITEPRESS, name: "VitePress", icon: "🚀", disabled: true },
+    { id: PlatformType.VUEPRESS, name: "VuePress", icon: "📚", disabled: false },
+  ]
+  // 模式选项
+  const exportModes = [
+    { value: ExportMode.NOTEBOOK, label: "笔记本模式" },
+    { value: ExportMode.DOCUMENT, label: "文档模式" },
   ]
   let isAdvancedOpen = false
   let isExporting = false
+  let docInfo = undefined
+  let showPresetDialog = false
+  let presetNameInput = ""
 
   const handleBrowse = async () => {
     const mainWin = SiyuanDevice.siyuanWindow()
@@ -94,13 +110,132 @@
     }
   }
 
+  // 处理模式切换
+  const handleModeChange = async (mode: ExportMode) => {
+    if (mode === ExportMode.DOCUMENT) {
+      if (docInfo) {
+        exportConfig.update((c) => ({
+          ...c,
+          exportMode: mode,
+          homePageId: docInfo?.id ?? "",
+        }))
+      } else {
+        showMessage("无法获取当前文档", 3000, "error")
+      }
+    } else {
+      exportConfig.update((c) => ({
+        ...c,
+        exportMode: mode,
+        homePageId: "",
+      }))
+    }
+  }
+
+  const handleSavePreset = async () => {
+    showPresetDialog = true
+    presetNameInput = "" // 重置输入
+  }
+
+  // 处理确认保存
+  const handlePresetConfirm = async () => {
+    if (!presetNameInput.trim()) {
+      showMessage("预设名称不能为空", 3000, "error")
+      return
+    }
+
+    const configCopy = JSON.parse(JSON.stringify($exportConfig))
+    delete configCopy.outputFolder
+
+    presets.update((p) => ({
+      ...p,
+      [presetNameInput]: configCopy,
+    }))
+
+    await pluginInstance.saveData(PRESET_KEY, $presets)
+    selectedPreset = presetNameInput
+    showPresetDialog = false
+    showMessage(`预设 "${presetNameInput}" 保存成功`, 3000, "info")
+  }
+
+  // 新增删除方法
+  const handleDeletePreset = async () => {
+    if (!selectedPreset) return
+
+    // 二次确认
+    const confirm = await SiyuanDevice.siyuanWindow()
+      .require("@electron/remote")
+      .dialog.showMessageBox({
+        type: "question",
+        title: "删除预设",
+        message: `确定要删除预设 "${selectedPreset}" 吗？`,
+        buttons: ["取消", "删除"],
+      })
+
+    if (confirm.response !== 1) return
+
+    // 执行删除
+    presets.update((p) => {
+      const newPresets = { ...p }
+      delete newPresets[selectedPreset]
+      return newPresets
+    })
+
+    // 保存数据
+    await pluginInstance.saveData(PRESET_KEY, $presets)
+
+    // 重置选择
+    selectedPreset = ""
+    showMessage(`预设已删除`, 3000, "info")
+  }
+
+  const handlePresetChange = async (event) => {
+    const name = event.target.value
+    if (!name) return
+
+    const preset = $presets[name]
+    if (preset) {
+      exportConfig.update((c) => ({ ...c, ...preset }))
+    }
+  }
+
   onMount(async () => {
+    // 笔记本
     const res = await pluginInstance.kernelApi.lsNotebooks()
     notebooks = (res?.data as any)?.notebooks ?? []
-    exportConfig.update((c) => ({
-      ...c,
-      notebook: c.notebook || notebooks[0]?.id,
-    }))
+    const currentDocId = PageUtil.getPageId()
+    const docRes = await pluginInstance.kernelApi.getDocInfo(currentDocId)
+    docInfo = docRes?.data as any
+    pluginInstance.logger.debug("docInfo", docInfo)
+    // 初始化
+    if ($exportConfig.exportMode === ExportMode.DOCUMENT) {
+      exportConfig.update((c) => ({
+        ...c,
+        exportMode: ExportMode.DOCUMENT,
+        homePageId: docInfo?.id ?? "",
+      }))
+    } else {
+      exportConfig.update((c) => ({
+        ...c,
+        exportMode: ExportMode.NOTEBOOK,
+        notebook: notebooks[0]?.id ?? "",
+        homePageId: "",
+      }))
+    }
+    // 加载预设
+    const savedPresets = (await pluginInstance.loadData(PRESET_KEY)) || {}
+    presets.set(savedPresets)
+    // 加载第一个预设
+    const presetNames = Object.keys(savedPresets)
+    if (presetNames.length > 0) {
+      selectedPreset = presetNames[0]
+      exportConfig.update((c) => ({
+        ...c,
+        ...savedPresets[selectedPreset],
+      }))
+    } else {
+      selectedPreset = ""
+    }
+    pluginInstance.logger.debug("presets", $presets)
   })
 </script>
 
@@ -108,20 +243,65 @@
   <div class="header-group">
     <h3 class="title">
       {pluginInstance.i18n.export.title} -
-      {platforms.find((p) => p.id === $exportConfig.platform)?.name}
+      <select class="preset-select" bind:value={selectedPreset} on:change={handlePresetChange}>
+        <option value="">默认配置</option>
+        {#each Object.keys($presets) as name}
+          <option value={name}>{name}</option>
+        {/each}
+      </select>
+      <span class="save-preset" on:click={handleSavePreset}>
+        {pluginInstance.i18n.export.savePreset || "保存预设"}
+      </span>
+      <!-- 只在有选中预设时显示删除按钮 -->
+      {#if selectedPreset}
+        <span class="delete-preset" on:click={handleDeletePreset}>🗑️</span>
+      {/if}
     </h3>
     <div class="divider" />
   </div>
 
   <div class="form-group">
     <div class="form-row">
-      <label class="label">{pluginInstance.i18n.export.selectNotebook}</label>
-      <select class="select" bind:value={$exportConfig.notebook}>
-        {#each notebooks as notebook}
-          <option value={notebook.id}>{notebook.name}</option>
+      <label class="label">导出模式</label>
+      <div class="mode-options">
+        {#each exportModes as mode}
+          <label class="mode-option {$exportConfig.exportMode === mode.value ? 'active' : ''}">
+            <input
+              type="radio"
+              name="exportMode"
+              value={mode.value}
+              bind:group={$exportConfig.exportMode}
+              on:change={() => handleModeChange(mode.value)}
+            />
+            {mode.label}
+          </label>
         {/each}
-      </select>
+      </div>
     </div>
+
+    <!-- 笔记本模式选项 -->
+    {#if $exportConfig.exportMode === "notebook"}
+      <div class="form-row">
+        <label class="label">{pluginInstance.i18n.export.selectNotebook}</label>
+        <select class="select" bind:value={$exportConfig.notebook}>
+          {#each notebooks as notebook}
+            <option value={notebook.id}>{notebook.name}</option>
+          {/each}
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="label">首页ID</label>
+        <input type="text" class="input" bind:value={$exportConfig.homePageId} placeholder="请输入笔记本首页ID" />
+      </div>
+    {:else}
+      <div class="form-row">
+        <label class="label">当前文档</label>
+        <div class="hint">
+          <span class="icon">📄</span>
+          {docInfo.name || "未获取到当前文档ID"}
+        </div>
+      </div>
+    {/if}
 
     <div class="form-row">
       <label class="label">{pluginInstance.i18n.export.outputPath}</label>
@@ -173,13 +353,13 @@
   </div>
 
   <div class="switch-group">
-    <div class="switch-item">
+    <label class="switch-item">
       <div class="switch-container">
         <input type="checkbox" bind:checked={$exportConfig.fixTitle} class="switch-input" />
         <span class="slider round" />
       </div>
       <span class="label-text">{pluginInstance.i18n.export.fixTitle}</span>
-    </div>
+    </label>
 
     <label class="switch-item">
       <div class="switch-container">
@@ -218,9 +398,88 @@
       {pluginInstance.i18n.export.exportButton}
     {/if}
   </button>
+
+  <!-- 弹窗 -->
+  {#if showPresetDialog}
+    <div class="preset-dialog">
+      <div class="dialog-content">
+        <h3>保存预设</h3>
+        <input
+          type="text"
+          bind:value={presetNameInput}
+          placeholder="请输入预设名称"
+          on:keydown={(e) => e.key === "Enter" && handlePresetConfirm()}
+        />
+        <div class="dialog-buttons">
+          <button on:click={handlePresetConfirm}>确定</button>
+          <button on:click={() => (showPresetDialog = false)}>取消</button>
+        </div>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style lang="stylus">
+  // 弹窗样式
+  .preset-dialog
+    position: fixed
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background: rgba(0,0,0,0.5)
+    display: flex
+    justify-content: center
+    align-items: center
+    z-index: 1000
+
+  .dialog-content
+    background: var(--b3-theme-background)
+    padding: 20px
+    border-radius: 8px
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2)
+    width: 300px
+
+    h3
+      margin: 0 0 15px 0
+      font-size: 16px
+
+    input
+      width: 100%
+      padding: 8px
+      margin-bottom: 15px
+      border: 1px solid var(--b3-border-color)
+
+    .dialog-buttons
+      display: flex
+      gap: 10px
+      justify-content: flex-end
+
+      button
+        padding: 6px 12px
+        border-radius: 4px
+        cursor: pointer
+        &:first-child
+          background: #3b82f6
+          color: white
+          border: none
+        &:last-child
+          background: none
+          border: 1px solid var(--b3-border-color)
+
+  .delete-preset
+    font-size 12px
+    margin-left: 8px
+    cursor: pointer
+    opacity: 0.6
+    transition: opacity 0.2s
+    &:hover
+      opacity: 1
+      color: #ef4444
+
+  .preset-select
+    font-size 12px
+
   #export-container
     min-width: 480px
     max-width 100%
@@ -230,6 +489,22 @@
     color: #333
     border-radius: 8px
     box-shadow: 0 2px 8px rgba(0,0,0,0.1)
+
+  .header-group
+    display: flex
+    justify-content: space-between
+    align-items: center
+    position: relative
+
+    .save-preset
+      font-size: 12px
+      color: #3b82f6
+      cursor: pointer
+      transition: all 0.2s
+      margin-left: 8px
+      &:hover
+        text-decoration: underline
+        opacity: 0.8
 
   .form-group
     margin: 12px 0
@@ -248,6 +523,16 @@
       width 100%
     button
       width 30%
+
+  .hint
+    display: inline-flex
+    align-items: center
+    gap: 4px
+    padding: 4px 8px
+    background: #f5f5f5  // 浅灰背景
+    border-radius: 4px
+    .icon
+      font-size: 16px  // 图标稍大
 
   .platform-group {
     margin: 12px 0;
@@ -510,6 +795,17 @@
       background: #2a2a2a;
       color: #e0e0e0;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .save-preset {
+      color: #60a5fa
+    }
+
+    .hint {
+      background: #363636  // 深灰背景
+      .icon {
+        opacity: 0.9
+      }
     }
 
     .switch-group {
