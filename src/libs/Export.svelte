@@ -35,6 +35,7 @@
     { id: PlatformType.HEXO, name: "Hexo", icon: "🌍", disabled: true },
     { id: PlatformType.HUGO, name: "Hugo", icon: "⚡", disabled: true },
     { id: PlatformType.VITEPRESS, name: "VitePress", icon: "🚀", disabled: true },
+    { id: PlatformType.VUEPRESS, name: "VuePress", icon: "📚", disabled: false },
   ]
   // 模式选项
   const exportModes = [

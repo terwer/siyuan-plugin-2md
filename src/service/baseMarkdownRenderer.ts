@@ -123,6 +123,9 @@ class BaseMarkdownRenderer {
         if (this.opts.fixTitle) {
           dir_name = HtmlUtil.removeTitleNumber(dir_name)
         }
+        if (StrUtil.isEmptyString(dir_name)) {
+          return
+        }
         dir_arr.push(dir_name)
       })
       const toDir = path.join(...dir_arr)
@@ -194,7 +197,7 @@ class BaseMarkdownRenderer {
       for (let i = 0; i < currentPathFiles.length; i++) {
         const file = currentPathFiles[i] as any
         // 子文件路径
-        const subPath = file.path
+        const subPath = file.path || ""
         const subFilesRes = await that.listDocsByPath(notebook, subPath)
         const subDocs = subFilesRes.data as any
         const isLeaf = subDocs.files.length === 0
@@ -215,8 +218,8 @@ class BaseMarkdownRenderer {
       throw new Error("Unable to fetch docs")
     }
     const docInfo = docRes.data as any
-    const notebook = docInfo.box
-    path = docInfo.path
+    const notebook = docInfo?.box ?? ""
+    path = docInfo?.path ?? ""
     const res = await this.listDocsByPath(notebook, path)
     if (res.code !== 0) {
       throw new Error("Unable to fetch docs")

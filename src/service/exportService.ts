@@ -2,6 +2,7 @@ import RenderOptions from "../models/renderOptions"
 import PlatformType from "../models/PlatformType"
 import MkdocsMaterialRenderer from "./mkdocsMaterialRenderer"
 import DefaultRenderer from "./defaultRenderer"
+import VuepressRenderer from "./vuepressRenderer"
 
 /**
  * 导出服务
@@ -22,6 +23,10 @@ class ExportService {
     switch (type) {
       case PlatformType.MKDOCS: {
         markdownRender = new MkdocsMaterialRenderer(this.pluginInstance)
+        break
+      }
+      case PlatformType.VUEPRESS: {
+        markdownRender = new VuepressRenderer(this.pluginInstance)
         break
       }
       default: {
