@@ -144,6 +144,7 @@
       exportConfig.update((c) => ({
         ...c,
         exportMode: ExportMode.NOTEBOOK,
+        notebook: notebooks[0]?.id ?? "",
         homePageId: "",
       }))
     }
