@@ -4,7 +4,7 @@
 
 <img src="./icon.png" width="160" height="160" alt="icon">
 
-将思源笔记的文档批量转换为Markdown文件，支持转换属性为Hexo、Hugo、Vitepress、Obsidian等平台对应的FrontFormatter
+将思源笔记的文档批量转换为Markdown文件，支持Mkdocs、Hexo、Hugo、Vitepress、Vuepress、Obsidian等平台对应的FrontFormatter
 
 ## 核心特色
 
