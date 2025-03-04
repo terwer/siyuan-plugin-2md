@@ -118,25 +118,33 @@ class BaseMarkdownRenderer {
       let save_file: string
       const dir_arr = []
       paths.forEach((item: string) => {
-        dir_arr.push(nameMap[item])
+        let dir_name = nameMap[item]
+        if (this.opts.fixTitle) {
+          dir_name = HtmlUtil.removeTitleNumber(dir_name)
+        }
+        dir_arr.push(dir_name)
       })
       const toDir = path.join(...dir_arr)
       if (file.subFileCount > 0) {
         save_dir = path.join(this.opts.outputFolder, toDir)
         save_file = path.join(save_dir, "README.md")
         this.logger.debug("生成目录 => ", save_dir)
-        this.logger.debug("生成目录文件 => ", save_file)
       } else {
         const toFile = path.join(this.opts.outputFolder, toDir + ".md")
         save_dir = path.dirname(toFile)
         save_file = toFile
         this.logger.debug("复用文档目录 => ", save_dir)
-        this.logger.debug("生成文档 => ", save_file)
       }
       // 确保有目录
       if (!fs.existsSync(save_dir)) {
         fs.mkdirSync(save_dir)
       }
+      let save_file_name = path.basename(save_file)
+      if (this.opts.fixTitle) {
+        save_file_name = HtmlUtil.removeTitleNumber(save_file_name)
+      }
+      save_file = path.join(save_dir, save_file_name)
+      this.logger.debug("生成文档 => ", save_file)
       // 渲染单个 MD（核心方法）
       const md = await this.renderSingleDoc(pageId)
       // this.logger.info("save_dir=", { toPath: save_dir })

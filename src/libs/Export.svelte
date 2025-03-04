@@ -173,13 +173,13 @@
   </div>
 
   <div class="switch-group">
-    <div class="switch-item">
+    <label class="switch-item">
       <div class="switch-container">
         <input type="checkbox" bind:checked={$exportConfig.fixTitle} class="switch-input" />
         <span class="slider round" />
       </div>
       <span class="label-text">{pluginInstance.i18n.export.fixTitle}</span>
-    </div>
+    </label>
 
     <label class="switch-item">
       <div class="switch-container">

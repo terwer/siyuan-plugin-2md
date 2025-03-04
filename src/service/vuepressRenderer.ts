@@ -27,7 +27,7 @@ import BaseMarkdownRenderer from "./baseMarkdownRenderer"
 import { SiyuanDevice } from "zhi-device"
 import { isDev } from "../Constants"
 import RenderOptions from "../models/renderOptions"
-import { StrUtil } from "zhi-common"
+import { HtmlUtil, StrUtil } from "zhi-common"
 
 /**
  * Markdown渲染器
@@ -102,7 +102,6 @@ class VuepressRenderer extends BaseMarkdownRenderer {
       if (!fs.existsSync(save_dir)) {
         fs.mkdirSync(save_dir)
       }
-
       // 确保有目录
       if (!fs.existsSync(first_dir)) {
         fs.mkdirSync(first_dir)
@@ -138,6 +137,12 @@ author:
       // this.logger.info("save_dir=", { toPath: save_dir })
       // this.logger.info("md=>", { md: md })
       const fsPromise = SiyuanDevice.requireLib("fs").promises
+      let save_file_name = path.basename(save_file)
+      if (this.opts.fixTitle) {
+        save_file_name = HtmlUtil.removeTitleNumber(save_file_name)
+      }
+      save_file = path.join(save_dir, save_file_name)
+      this.logger.debug("生成文档 => ", save_file)
       await fsPromise.writeFile(save_file, md, { encoding: "utf8" })
 
       // 目录正文
@@ -159,7 +164,14 @@ author:
   name: terwer
   link: https://github.com/terwer
 ---`
-        await fsPromise.writeFile(first_file, dirMd, { encoding: "utf8" })
+        let first_save_file_name = path.basename(first_file)
+        const first_save_dir = path.dirname(first_file)
+        if (this.opts.fixTitle) {
+          first_save_file_name = HtmlUtil.removeTitleNumber(first_save_file_name)
+        }
+        const first_save_file = path.join(first_save_dir, first_save_file_name)
+        this.logger.debug("生成文档 => ", first_save_file)
+        await fsPromise.writeFile(first_save_file, dirMd, { encoding: "utf8" })
       }
     }
 
