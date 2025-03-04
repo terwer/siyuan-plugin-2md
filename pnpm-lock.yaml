@@ -46,8 +46,8 @@ importers:
         specifier: ^2.0.5
         version: 2.0.5
       siyuan:
-        specifier: ^0.7.9
-        version: 0.7.9
+        specifier: ^1.0.9
+        version: 1.0.9
       stylus:
         specifier: ^0.59.0
         version: 0.59.0
@@ -1262,8 +1262,8 @@ packages:
   shorthash2@1.0.5:
     resolution: {integrity: sha512-OgKQtF1rIj79taV/coJyp0E6zfo6MmGNAsIepwjoWV2IYlpvWzhU2kFe9o8wSzJRysEhvmLlDHVOXe8/pWqK1Q==}
 
-  siyuan@0.7.9:
-    resolution: {integrity: sha512-X5olBQhfkgyPRF+d8agpcbAaFnCSvSkN3LWX7XU9jApmCfpJ/4PAmK7mKPfR1YGBpjFLRa/xTrv11BQ3hxN15Q==}
+  siyuan@1.0.9:
+    resolution: {integrity: sha512-l79oJ7jbjtA/KcP9zNN3dL2r7nGSnqqanuSChgknGZQK7XR2awrfn7Uyj9qY1zTf3kBCovoQCsUYRmUCQ72p8g==}
 
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
@@ -2765,7 +2765,7 @@ snapshots:
 
   shorthash2@1.0.5: {}
 
-  siyuan@0.7.9: {}
+  siyuan@1.0.9: {}
 
   slash@3.0.0: {}
 
