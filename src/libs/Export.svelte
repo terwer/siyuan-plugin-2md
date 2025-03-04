@@ -12,6 +12,7 @@
 
   export let pluginInstance: ExportMdPlugin
   const exportService = new ExportService(pluginInstance)
+  const CONFIG_PRESET = "export-preset.json"
 
   // 导出配置数据（改为响应式存储）
   const exportConfig = writable({
@@ -125,6 +126,14 @@
     }
   }
 
+  const handleSavePreset = async () => {
+    const configCopy = JSON.parse(JSON.stringify($exportConfig))
+    delete configCopy.outputFolder
+    // 保存到本地存储或插件配置
+    await pluginInstance.saveData(CONFIG_PRESET, configCopy)
+    showMessage("预设保存成功", 3000, "info")
+  }
+
   onMount(async () => {
     // 笔记本
     const res = await pluginInstance.kernelApi.lsNotebooks()
@@ -148,6 +157,14 @@
         homePageId: "",
       }))
     }
+    // 加载预设
+    const preset = await pluginInstance.loadData(CONFIG_PRESET)
+    if (preset) {
+      exportConfig.update((c) => ({
+        ...c,
+        ...preset,
+      }))
+    }
   })
 </script>
 
@@ -156,6 +173,9 @@
     <h3 class="title">
       {pluginInstance.i18n.export.title} -
       {platforms.find((p) => p.id === $exportConfig.platform)?.name}
+      <span class="save-preset" on:click={handleSavePreset}>
+        {pluginInstance.i18n.export.savePreset || "保存预设"}
+      </span>
     </h3>
     <div class="divider" />
   </div>
@@ -311,6 +331,22 @@
     border-radius: 8px
     box-shadow: 0 2px 8px rgba(0,0,0,0.1)
 
+  .header-group
+    display: flex
+    justify-content: space-between
+    align-items: center
+    position: relative
+
+    .save-preset
+      font-size: 12px
+      color: #3b82f6
+      cursor: pointer
+      transition: all 0.2s
+      margin-left: 8px
+      &:hover
+        text-decoration: underline
+        opacity: 0.8
+
   .form-group
     margin: 12px 0
 
@@ -328,6 +364,16 @@
       width 100%
     button
       width 30%
+
+  .hint
+    display: inline-flex
+    align-items: center
+    gap: 4px
+    padding: 4px 8px
+    background: #f5f5f5  // 浅灰背景
+    border-radius: 4px
+    .icon
+      font-size: 16px  // 图标稍大
 
   .platform-group {
     margin: 12px 0;
@@ -590,6 +636,17 @@
       background: #2a2a2a;
       color: #e0e0e0;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .save-preset {
+      color: #60a5fa
+    }
+
+    .hint {
+      background: #363636  // 深灰背景
+      .icon {
+        opacity: 0.9
+      }
     }
 
     .switch-group {

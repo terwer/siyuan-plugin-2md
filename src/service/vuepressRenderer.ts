@@ -57,7 +57,7 @@ class VuepressRenderer extends BaseMarkdownRenderer {
     if (!fs.existsSync(this.opts.outputFolder)) {
       fs.mkdirSync(this.opts.outputFolder, { recursive: true })
     }
-    const ret: any = await this.getAllFileList(this.opts.notebook, "")
+    const ret: any = await this.getAllFileList("")
     const files = ret.ret
     const nameMap = ret.nameMap
     this.logger.info(`Found ${files.length} files.`, files)
