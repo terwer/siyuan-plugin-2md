@@ -63,6 +63,14 @@ class KernelApi extends BaseApi {
     const url = "/api/notebook/lsNotebooks"
     return await this.siyuanRequest(url, data)
   }
+
+  public async getDocInfo(docId: string): Promise<SiyuanData> {
+    const data = {
+      id: docId,
+    }
+    const url = "/api/block/getDocInfo"
+    return await this.siyuanRequest(url, data)
+  }
 }
 
 export default KernelApi

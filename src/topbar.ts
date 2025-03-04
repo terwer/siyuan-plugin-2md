@@ -57,7 +57,7 @@ class Topbar {
     topBarElement.addEventListener("click", async (event) => {
       const exportId = "export-md-dialog"
       const d = new Dialog({
-        title: `${this.pluginInstance.i18n.exportMd} - ${this.pluginInstance.i18n.sharePro} v${pkg.version}`,
+        title: `${this.pluginInstance.i18n.exportMd} - v${pkg.version}`,
         content: `<div id="${exportId}"></div>`,
         width: this.pluginInstance.isMobile ? "92vw" : "61.8vw",
       })

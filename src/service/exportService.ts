@@ -29,7 +29,9 @@ class ExportService {
       }
     }
     const opts = new RenderOptions()
+    opts.exportMode = exportConfig.exportMode
     opts.notebook = exportConfig.notebook
+    opts.homePageId = exportConfig.homePageId
     opts.outputFolder = exportConfig.outputFolder
     opts.basePath = exportConfig.basePath
     opts.assetFolder = exportConfig.assetFolder

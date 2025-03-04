@@ -1,4 +1,4 @@
-import PlatformType from "./PlatformType"
+import ExportMode from "./ExportMode"
 
 /**
  * 偏好设置
@@ -8,9 +8,17 @@ import PlatformType from "./PlatformType"
  */
 class RenderOptions {
   /**
+   * 导出模式
+   */
+  exportMode: ExportMode = ExportMode.NOTEBOOK
+  /**
    * 笔记本ID
    */
   public notebook: string
+  /**
+   * 首页
+   */
+  public homePageId: string
   /**
    * 输出文件夹
    */

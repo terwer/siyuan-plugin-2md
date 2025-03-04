@@ -7,13 +7,17 @@
   import ExportService from "../service/exportService"
   import { showMessage } from "siyuan"
   import { writable } from "svelte/store"
+  import ExportMode from "../models/ExportMode"
+  import PageUtil from "../utils/pageUtil"
 
   export let pluginInstance: ExportMdPlugin
   const exportService = new ExportService(pluginInstance)
 
   // 导出配置数据（改为响应式存储）
   const exportConfig = writable({
+    exportMode: ExportMode.NOTEBOOK,
     notebook: "",
+    homePageId: "",
     outputFolder: "",
     fixTitle: true,
     linkAsPlainText: false,
@@ -23,7 +27,7 @@
   })
 
   let notebooks = []
-  // 平台选项数据（保持原样）
+  // 平台选项数据
   const platforms = [
     { id: PlatformType.DEFAULT, name: "通用MD", icon: "📁", disabled: false },
     { id: PlatformType.MKDOCS, name: "MkDocs", icon: "📘", disabled: false },
@@ -31,8 +35,14 @@
     { id: PlatformType.HUGO, name: "Hugo", icon: "⚡", disabled: true },
     { id: PlatformType.VITEPRESS, name: "VitePress", icon: "🚀", disabled: true },
   ]
+  // 模式选项
+  const exportModes = [
+    { value: ExportMode.NOTEBOOK, label: "笔记本模式" },
+    { value: ExportMode.DOCUMENT, label: "文档模式" },
+  ]
   let isAdvancedOpen = false
   let isExporting = false
+  let docInfo = undefined
 
   const handleBrowse = async () => {
     const mainWin = SiyuanDevice.siyuanWindow()
@@ -94,13 +104,49 @@
     }
   }
 
+  // 处理模式切换
+  const handleModeChange = async (mode: ExportMode) => {
+    if (mode === ExportMode.DOCUMENT) {
+      if (docInfo) {
+        exportConfig.update((c) => ({
+          ...c,
+          exportMode: mode,
+          homePageId: docInfo?.id ?? "",
+        }))
+      } else {
+        showMessage("无法获取当前文档", 3000, "error")
+      }
+    } else {
+      exportConfig.update((c) => ({
+        ...c,
+        exportMode: mode,
+        homePageId: "",
+      }))
+    }
+  }
+
   onMount(async () => {
+    // 笔记本
     const res = await pluginInstance.kernelApi.lsNotebooks()
     notebooks = (res?.data as any)?.notebooks ?? []
-    exportConfig.update((c) => ({
-      ...c,
-      notebook: c.notebook || notebooks[0]?.id,
-    }))
+    const currentDocId = PageUtil.getPageId()
+    const docRes = await pluginInstance.kernelApi.getDocInfo(currentDocId)
+    docInfo = docRes?.data as any
+    pluginInstance.logger.debug("docInfo", docInfo)
+    // 初始化
+    if ($exportConfig.exportMode === ExportMode.DOCUMENT) {
+      exportConfig.update((c) => ({
+        ...c,
+        exportMode: ExportMode.DOCUMENT,
+        homePageId: docInfo?.id ?? "",
+      }))
+    } else {
+      exportConfig.update((c) => ({
+        ...c,
+        exportMode: ExportMode.NOTEBOOK,
+        homePageId: "",
+      }))
+    }
   })
 </script>
 
@@ -115,13 +161,46 @@
 
   <div class="form-group">
     <div class="form-row">
-      <label class="label">{pluginInstance.i18n.export.selectNotebook}</label>
-      <select class="select" bind:value={$exportConfig.notebook}>
-        {#each notebooks as notebook}
-          <option value={notebook.id}>{notebook.name}</option>
+      <label class="label">导出模式</label>
+      <div class="mode-options">
+        {#each exportModes as mode}
+          <label class="mode-option {$exportConfig.exportMode === mode.value ? 'active' : ''}">
+            <input
+              type="radio"
+              name="exportMode"
+              value={mode.value}
+              bind:group={$exportConfig.exportMode}
+              on:change={() => handleModeChange(mode.value)}
+            />
+            {mode.label}
+          </label>
         {/each}
-      </select>
+      </div>
     </div>
+
+    <!-- 笔记本模式选项 -->
+    {#if $exportConfig.exportMode === "notebook"}
+      <div class="form-row">
+        <label class="label">{pluginInstance.i18n.export.selectNotebook}</label>
+        <select class="select" bind:value={$exportConfig.notebook}>
+          {#each notebooks as notebook}
+            <option value={notebook.id}>{notebook.name}</option>
+          {/each}
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="label">首页ID</label>
+        <input type="text" class="input" bind:value={$exportConfig.homePageId} placeholder="请输入笔记本首页ID" />
+      </div>
+    {:else}
+      <div class="form-row">
+        <label class="label">当前文档</label>
+        <div class="hint">
+          <span class="icon">📄</span>
+          {docInfo.name || "未获取到当前文档ID"}
+        </div>
+      </div>
+    {/if}
 
     <div class="form-row">
       <label class="label">{pluginInstance.i18n.export.outputPath}</label>
