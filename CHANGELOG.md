@@ -2,19 +2,11 @@
 <a name="v0.0.3"></a>
 
 ## [1.1.0](https://github.com/terwer/siyuan-plugin-2md/compare/v1.0.0...v1.1.0) (2025-03-04)
-
-
 ### Features
-
 * fix options ([a3954da](https://github.com/terwer/siyuan-plugin-2md/commit/a3954da1e44ea0b31434e63daeacc01fbdf24cab))
-* support document mode ([b371a1d](https://github.com/terwer/siyuan-plugin-2md/commit/b371a1d3ee3f4c5987bed2447891dde8baa17988))
-* support document mode ([e653631](https://github.com/terwer/siyuan-plugin-2md/commit/e653631101ff645b6f367bf1f7b095877ad8d254))
-* support document mode ([459156c](https://github.com/terwer/siyuan-plugin-2md/commit/459156c80d497ec6eec705dbf38853600a39abec))
 * support document mode ([ccd37ef](https://github.com/terwer/siyuan-plugin-2md/commit/ccd37ef76cccd048bbd82c9b810bee82b976bcd5))
 * support presets ([15a07c6](https://github.com/terwer/siyuan-plugin-2md/commit/15a07c6f4a2cde9ce7b0157180288e72d476b428))
-
 ## 1.0.0 (2025-03-03)
-### Features
 * add default renderer ([866c764](https://github.com/terwer/siyuan-plugin-2md/commit/866c764657b5063dd2b10695532652155e7cafe6))
 * add render options ([f30757e](https://github.com/terwer/siyuan-plugin-2md/commit/f30757e3a9b7aeeb44253f96a3ac9bc9fe86f03d))
 * export ui ([d779ea1](https://github.com/terwer/siyuan-plugin-2md/commit/d779ea14227453b86b262100d3c076f5602db278))
