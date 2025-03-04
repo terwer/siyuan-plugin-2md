@@ -4,13 +4,15 @@
 
 <img src="./icon.png" width="160" height="160" alt="icon">
 
-将思源笔记的文档批量转换为Markdown文件，支持转换属性为Hexo、Hugo、Vitepress、Obsidian等平台对应的FrontFormatter
+将思源笔记的文档批量转换为Markdown文件，支持Mkdocs、Hexo、Hugo、Vitepress、Vuepress、Obsidian等平台对应的FrontFormatter
 
 ## 核心特色
 
 - **一键操作**：支持一键批量转换
 - **属性转换**：支持属性转换为FrontFormatter
 - **选择笔记**：支持自定义选择笔记本，默认选择第一个笔记本
+- **文档模式**：支持把当前打开的文档作为根文档，到处该文档以及它下面的子文档
+- **预设支持**: 支持保存多个预设配置，方便各种平台个性化导出需求
 - **输出配置**：支持自定义输出目录（可单独设置对应平台的输出目录，默认输出到用户 `[思源笔记工作空间]/temp/siyuan2md/[平台名称]` 目录）
 
 ## FAQ

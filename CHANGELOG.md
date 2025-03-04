@@ -1,8 +1,12 @@
 <!-- insertion marker -->
 <a name="v0.0.3"></a>
 
-## 1.0.0 (2025-03-03)
+## [1.1.0](https://github.com/terwer/siyuan-plugin-2md/compare/v1.0.0...v1.1.0) (2025-03-04)
 ### Features
+* fix options ([a3954da](https://github.com/terwer/siyuan-plugin-2md/commit/a3954da1e44ea0b31434e63daeacc01fbdf24cab))
+* support document mode ([ccd37ef](https://github.com/terwer/siyuan-plugin-2md/commit/ccd37ef76cccd048bbd82c9b810bee82b976bcd5))
+* support presets ([15a07c6](https://github.com/terwer/siyuan-plugin-2md/commit/15a07c6f4a2cde9ce7b0157180288e72d476b428))
+## 1.0.0 (2025-03-03)
 * add default renderer ([866c764](https://github.com/terwer/siyuan-plugin-2md/commit/866c764657b5063dd2b10695532652155e7cafe6))
 * add render options ([f30757e](https://github.com/terwer/siyuan-plugin-2md/commit/f30757e3a9b7aeeb44253f96a3ac9bc9fe86f03d))
 * export ui ([d779ea1](https://github.com/terwer/siyuan-plugin-2md/commit/d779ea14227453b86b262100d3c076f5602db278))
