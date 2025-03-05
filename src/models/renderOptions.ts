@@ -20,6 +20,10 @@ class RenderOptions {
    */
   public homePageId: string
   /**
+   * 首页是否生成
+   */
+  public generateHomePage: boolean
+  /**
    * 输出文件夹
    */
   public outputFolder: string

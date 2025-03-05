@@ -42,6 +42,7 @@ class ExportService {
     opts.assetFolder = exportConfig.assetFolder
     opts.fixTitle = exportConfig.fixTitle
     opts.linkAsPlainText = exportConfig.linkAsPlainText
+    opts.generateHomePage = exportConfig.generateHomePage
     this.pluginInstance.logger.info(`Start syncing markdown files => ${opts.outputFolder}`)
     markdownRender.setOpts(opts)
     count = await markdownRender.doRender()
