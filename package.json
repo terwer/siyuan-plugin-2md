@@ -26,7 +26,7 @@
     "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^22.13.9",
     "fast-glob": "^3.3.3",
-    "glob": "^7.2.3",
+    "glob": "^11.0.1",
     "minimist": "^1.2.8",
     "rollup-plugin-livereload": "^2.0.5",
     "siyuan": "^1.1.0",
