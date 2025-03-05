@@ -24,6 +24,7 @@
     outputFolder: "",
     fixTitle: true,
     linkAsPlainText: false,
+    generateHomePage: true, // 新增生成首页选项
     basePath: "/",
     assetFolder: "/assets",
     platform: PlatformType.DEFAULT,
@@ -367,6 +368,14 @@
         <span class="slider round" />
       </div>
       <span class="label-text">{pluginInstance.i18n.export.linkAsPlainText}</span>
+    </label>
+
+    <label class="switch-item">
+      <div class="switch-container">
+        <input type="checkbox" bind:checked={$exportConfig.generateHomePage} class="switch-input" />
+        <span class="slider round" />
+      </div>
+      <span class="label-text">{pluginInstance.i18n.export.generateHomePage || "生成首页"}</span>
     </label>
   </div>
 

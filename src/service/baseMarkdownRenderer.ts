@@ -157,7 +157,7 @@ class BaseMarkdownRenderer {
       await fsPromise.writeFile(save_file, md, { encoding: "utf8" })
     }
     // 生成首页
-    if (!StrUtil.isEmptyString(this.opts.homePageId)) {
+    if (this.opts.generateHomePage !== false && !StrUtil.isEmptyString(this.opts.homePageId)) {
       const md = await this.renderSingleDoc(this.opts.homePageId)
       const home_save_file = path.join(this.opts.outputFolder, "index.md")
       const fsPromise = SiyuanDevice.requireLib("fs").promises
