@@ -64,8 +64,8 @@ importers:
         specifier: 5.4.10
         version: 5.4.10(@types/node@22.13.9)(stylus@0.64.0)
       vite-plugin-static-copy:
-        specifier: ^0.15.0
-        version: 0.15.0(vite@5.4.10(@types/node@22.13.9)(stylus@0.64.0))
+        specifier: ^2.3.0
+        version: 2.3.0(vite@5.4.10(@types/node@22.13.9)(stylus@0.64.0))
       vite-plugin-zip-pack:
         specifier: ^1.2.4
         version: 1.2.4(vite@5.4.10(@types/node@22.13.9)(stylus@0.64.0))
@@ -1177,6 +1177,10 @@ packages:
     resolution: {integrity: sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==}
     engines: {node: '>=10'}
 
+  p-map@7.0.3:
+    resolution: {integrity: sha512-VkndIv2fIB99swvQoA65bm+fsmt6UNdGeIB0oxBs+WhAhdh08QA04JXpI7rbB9r08/nkbysKoya9rtDERYOYMA==}
+    engines: {node: '>=18'}
+
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
 
@@ -1483,11 +1487,11 @@ packages:
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
 
-  vite-plugin-static-copy@0.15.0:
-    resolution: {integrity: sha512-Ww+/Ug9guV45oIfIi/lA2z8v3K+lLHV9zCJqTVO4FTdqrJoZBj68VgGBSH1fi0N4q/EHW32RsL3ympi4Wlsq5w==}
-    engines: {node: ^14.18.0 || >=16.0.0}
+  vite-plugin-static-copy@2.3.0:
+    resolution: {integrity: sha512-LLKwhhHetGaCnWz4mas4qqjjguDka6/6b4+SeIohRroj8aCE7QTfiZECfPecslFQkWZ3HdQuq5kOPmWZjNYlKA==}
+    engines: {node: ^18.0.0 || >=20.0.0}
     peerDependencies:
-      vite: ^3.0.0 || ^4.0.0
+      vite: ^5.0.0 || ^6.0.0
 
   vite-plugin-zip-pack@1.2.4:
     resolution: {integrity: sha512-QgZEeiWayE2ZvMbkvcqWf94p/Z5YeNHZlkwXWIkkoISjePiWVXKRX2xCGmsURe9acGVdkobZ31dFJuCp3j1hMg==}
@@ -2786,6 +2790,8 @@ snapshots:
     dependencies:
       p-limit: 3.1.0
 
+  p-map@7.0.3: {}
+
   package-json-from-dist@1.0.1: {}
 
   pako@1.0.11: {}
@@ -3088,11 +3094,12 @@ snapshots:
 
   v8-compile-cache-lib@3.0.1: {}
 
-  vite-plugin-static-copy@0.15.0(vite@5.4.10(@types/node@22.13.9)(stylus@0.64.0)):
+  vite-plugin-static-copy@2.3.0(vite@5.4.10(@types/node@22.13.9)(stylus@0.64.0)):
     dependencies:
       chokidar: 3.6.0
       fast-glob: 3.3.3
       fs-extra: 11.3.0
+      p-map: 7.0.3
       picocolors: 1.1.1
       vite: 5.4.10(@types/node@22.13.9)(stylus@0.64.0)
 
