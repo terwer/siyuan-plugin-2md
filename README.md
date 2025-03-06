@@ -4,13 +4,15 @@
 
 <img src="./icon.png" width="160" height="160" alt="icon">
 
-Batch convert the documents of Siyuan Notes into Markdown files, and support the conversion properties of FrontFormatter corresponding to Hexo, Hugo, Vitepress, Obsidian and other platforms
+Batch convert the documents of Siyuan Notes into Markdown files, and support Mkdocs, Hexo, Hugo, Vitepress, Vuepress, Obsidian and other platforms
 
 ## Core Features
 
 - **One-key operation**: Support one-key batch conversion
 - **Property Conversion**: Support property conversion to FrontFormatter
-- **Select Notes**: Support custom selection of notebooks, default all
+- **Select Notes**: Support custom selection of notebooks, default select first one
+- **Document Mode**: Supports using the currently opened document as the root document to export it along with its sub-documents.
+- **Preset Support**: Allows saving multiple preset configurations to facilitate personalized export requirements for various platforms.
 - **Output Configuration**: Support custom output directory (the output directory of the corresponding platform can be set separately, and the default output is to the user `[siyuan-note Workspace]/temp/siyuan2md/[platform name]` directory)
 
 ## FAQ

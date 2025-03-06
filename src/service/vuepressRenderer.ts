@@ -23,8 +23,11 @@
  * questions.
  */
 
-import MarkdownRenderer from "./markdownRenderer"
+import BaseMarkdownRenderer from "./baseMarkdownRenderer"
 import { SiyuanDevice } from "zhi-device"
+import { isDev } from "../Constants"
+import RenderOptions from "../models/renderOptions"
+import { HtmlUtil, StrUtil } from "zhi-common"
 
 /**
  * Markdown渲染器
@@ -32,15 +35,29 @@ import { SiyuanDevice } from "zhi-device"
  * @author terwer
  * @since 1.0.0
  */
-class VuepressRenderer extends MarkdownRenderer {
-  public async renderMd() {
+class VuepressRenderer extends BaseMarkdownRenderer {
+  protected async initConfig(opts: RenderOptions): Promise<void> {
+    await super.initConfig(opts)
+    const notebook = "20210808180117-czj9bvb"
+    const workspaceFolder = SiyuanDevice.siyuanWorkspacePath()
+    const outputFolder = SiyuanDevice.joinPath(workspaceFolder, "temp", "siyuan2md", "vuepress")
+    if (StrUtil.isEmptyString(opts.notebook)) {
+      opts.notebook = notebook
+    }
+    if (StrUtil.isEmptyString(opts.outputFolder)) {
+      opts.outputFolder = outputFolder
+    }
+    this.logger.info(`vuepress outputFolder => ${opts.outputFolder}`)
+  }
+
+  protected async renderMd() {
     this.logger.info("render md to vuepress")
     const fs = SiyuanDevice.requireLib("fs")
     const path = SiyuanDevice.requireLib("path")
-    if (!fs.existsSync(this.outputFolder)) {
-      fs.mkdirSync(this.outputFolder, { recursive: true })
+    if (!fs.existsSync(this.opts.outputFolder)) {
+      fs.mkdirSync(this.opts.outputFolder, { recursive: true })
     }
-    const ret: any = await this.getAllFileList(this.notebook, "")
+    const ret: any = await this.getAllFileList("")
     const files = ret.ret
     const nameMap = ret.nameMap
     this.logger.info(`Found ${files.length} files.`, files)
@@ -51,6 +68,11 @@ class VuepressRenderer extends MarkdownRenderer {
       const paths = file.path.replace(/\.sy/, "").split("/")
       this.logger.debug("paths =>", paths)
 
+      const first_dir = path.join(this.opts.outputFolder, "000.目录页")
+      let first_file: string
+      let first_file_name: string
+      let first_file_slug: string
+
       let save_dir: string
       let save_file: string
       const dir_arr = []
@@ -59,12 +81,18 @@ class VuepressRenderer extends MarkdownRenderer {
       })
       const toDir = path.join(...dir_arr)
       if (file.subFileCount > 0) {
-        save_dir = path.join(this.outputFolder, toDir)
+        first_file_name = dir_arr[0]
+        // first_file_slug = dir_arr[0]
+        first_file_slug = "test" + i
+        first_file = path.join(first_dir, dir_arr[0] + ".md")
+        save_dir = path.join(this.opts.outputFolder, toDir)
         save_file = path.join(save_dir, "README.md")
         this.logger.debug("生成目录 => ", save_dir)
+        this.logger.debug("一级目录目录 => ", first_dir)
+        this.logger.debug("一级目录目录文件 => ", first_file)
         this.logger.debug("生成目录文件 => ", save_file)
       } else {
-        const toFile = path.join(this.outputFolder, toDir + ".md")
+        const toFile = path.join(this.opts.outputFolder, toDir + ".md")
         save_dir = path.dirname(toFile)
         save_file = toFile
         this.logger.debug("复用文档目录 => ", save_dir)
@@ -74,18 +102,77 @@ class VuepressRenderer extends MarkdownRenderer {
       if (!fs.existsSync(save_dir)) {
         fs.mkdirSync(save_dir)
       }
-
-      const mdRes = await this.kernelApi.exportMdContent(pageId)
-      if (mdRes.code !== 0) {
-        throw new Error(mdRes.msg)
+      // 确保有目录
+      if (!fs.existsSync(first_dir)) {
+        fs.mkdirSync(first_dir)
       }
-      const mdResData = mdRes.data as any
-      const md = mdResData.content
 
+      // md正文
+      const mdFM = `---
+title: Java_SE之Java_SE平台与JDK
+date: 2022-09-05 12:20:12
+permalink: /post/java-se-platform-and-jdk.html
+meta:
+  - name: keywords
+    content: 平台 版本 jdk javase java kotlin
+  - name: description
+    content: >-
+      java平台javase_javaplatformstandardeditionjavase是一个计算平台用于为桌面和服务器环境开发和部署可移植代码。javase以前称为javaplatformstandardedition(jse)。javame_javaplatformmicroeditionjavame是一个计算平台用于为嵌入式和移动设备（微控制器传感器网关移动电话个人数字助理电视机顶盒打印机）开发和部署可移植代码。javame以前称为javaplatformmicroedition或jme。截至年
+categories:
+  - 默认分类
+tags:
+  - 平台
+  - 版本
+  - jdk
+  - javase
+  - java
+  - kotlin
+author:
+  name: terwer
+  link: https://github.com/terwer
+---`
+      // 渲染单个 MD（核心方法）
+      const mdContent = await this.renderSingleDoc(pageId)
+      const md = mdFM + "\n" + mdContent
       // this.logger.info("save_dir=", { toPath: save_dir })
       // this.logger.info("md=>", { md: md })
       const fsPromise = SiyuanDevice.requireLib("fs").promises
+      let save_file_name = path.basename(save_file)
+      if (this.opts.fixTitle) {
+        save_file_name = HtmlUtil.removeTitleNumber(save_file_name)
+      }
+      save_file = path.join(save_dir, save_file_name)
+      this.logger.debug("生成文档 => ", save_file)
       await fsPromise.writeFile(save_file, md, { encoding: "utf8" })
+
+      // 目录正文
+      if (first_file) {
+        const dirMd = `---
+pageComponent:
+  name: Catalogue
+  data:
+    path: ${first_file_name}
+    imgUrl: /img/web.png
+    description: 服务端技术分享
+title: ${first_file_name}
+date: 2011-03-11 21:50:53
+permalink: /${first_file_slug}/
+article: false
+comment: false
+editLink: false
+author:
+  name: terwer
+  link: https://github.com/terwer
+---`
+        let first_save_file_name = path.basename(first_file)
+        const first_save_dir = path.dirname(first_file)
+        if (this.opts.fixTitle) {
+          first_save_file_name = HtmlUtil.removeTitleNumber(first_save_file_name)
+        }
+        const first_save_file = path.join(first_save_dir, first_save_file_name)
+        this.logger.debug("生成文档 => ", first_save_file)
+        await fsPromise.writeFile(first_save_file, dirMd, { encoding: "utf8" })
+      }
     }
 
     return files.length

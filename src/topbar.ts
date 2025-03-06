@@ -25,36 +25,50 @@
 
 import ExportMdPlugin from "./index"
 import { icons } from "./utils/svg"
-import VuepressRenderer from "./service/vuepressRenderer"
+import { Dialog, Menu } from "siyuan"
+import Export from "./libs/Export.svelte"
+import pkg from "../package.json"
 
-/**
- * 顶栏按钮
- *
- * @param pluginInstance - 插件实例
- * @author terwer
- * @version 0.0.1
- * @since 0.0.1
- */
-export async function initTopbar(pluginInstance: ExportMdPlugin) {
-  const topBarElement = pluginInstance.addTopBar({
-    icon: icons.icon2md,
-    title: pluginInstance.i18n.exportMd,
-    position: "right",
-    callback: () => {},
-  })
+class Topbar {
+  protected pluginInstance: ExportMdPlugin
+  private rect: DOMRect
+  private contentMenu: Menu
+  private contentMenuElement: HTMLElement
 
-  topBarElement.addEventListener("click", async (event) => {
-    pluginInstance.logger.info("Start syncing markdown files ...")
-    const startTime = Date.now()
+  constructor(pluginInstance: ExportMdPlugin) {
+    this.pluginInstance = pluginInstance
+  }
 
-    const markdownRender = new VuepressRenderer(pluginInstance)
-    const count = await markdownRender.renderMd()
+  /**
+   * 顶栏按钮
+   *
+   * @author terwer
+   * @version 0.0.1
+   * @since 0.0.1
+   */
+  public async initTopbar() {
+    const topBarElement = this.pluginInstance.addTopBar({
+      icon: icons.icon2md,
+      title: this.pluginInstance.i18n.exportMd,
+      position: "right",
+      callback: () => {},
+    })
 
-    pluginInstance.logger.info(`Synced (${count}) markdown files.`)
-    const endTime = Date.now()
-    const cost = ((endTime - startTime) / 1000.0).toFixed(2)
-    pluginInstance.logger.info(`Render cost: ${cost} seconds`)
-
-    event.stopPropagation()
-  })
+    topBarElement.addEventListener("click", async (event) => {
+      const exportId = "export-md-dialog"
+      const d = new Dialog({
+        title: `${this.pluginInstance.i18n.exportMd} - v${pkg.version}`,
+        content: `<div id="${exportId}"></div>`,
+        width: this.pluginInstance.isMobile ? "92vw" : "61.8vw",
+      })
+      new Export({
+        target: document.getElementById(exportId) as HTMLElement,
+        props: {
+          pluginInstance: this.pluginInstance,
+        },
+      })
+    })
+  }
 }
+
+export { Topbar }

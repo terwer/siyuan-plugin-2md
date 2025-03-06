@@ -24,5 +24,5 @@
  */
 
 export const icons = {
-  icon2md: `<svg><use xlink:href="#iconCut"></use></svg>`,
+  icon2md: `<svg><use xlink:href="#iconMarkdown"></use></svg>`,
 }

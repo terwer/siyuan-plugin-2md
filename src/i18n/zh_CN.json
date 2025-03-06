@@ -1,5 +1,21 @@
 {
   "cancel": "取消",
   "save": "保存",
-  "exportMd": "Markdown批量转换"
+  "exportMd": "Markdown批量转换",
+  "export": {
+    "title": "自定义导出MD文件",
+    "selectNotebook": "选择笔记本",
+    "outputPath": "输出路径",
+    "outputPathPlaceholder": "MD文件保存在这里，系统绝对路径",
+    "browse": "选择文件夹",
+    "selectPlatform": "选择平台",
+    "fixTitle": "去除标题序号",
+    "linkAsPlainText": "忽略链接（直接显示为文本）",
+    "advancedSettings": "高级设置",
+    "basePath": "文档根路径",
+    "assetFolder": "资源文件根路径",
+    "exportButton": "开始导出",
+    "exporting": "正在导出，请稍后...",
+    "outputFolderEmpty": "输出路径不能为空"
+  }
 }

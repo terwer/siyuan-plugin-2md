@@ -24,13 +24,13 @@
  */
 
 import { App, getFrontend, IObject, Plugin } from "siyuan"
-import { initTopbar } from "./topbar"
+import { Topbar } from "./topbar"
 import KernelApi from "./api/kernel-api"
-import { simpleLogger } from "zhi-lib-base"
+import { ILogger, simpleLogger } from "zhi-lib-base"
 import { isDev } from "./Constants"
 
 import "./index.styl"
-import MarkdownRenderer from "./service/markdownRenderer"
+import BaseMarkdownRenderer from "./service/baseMarkdownRenderer"
 
 /**
  * 别名插件
@@ -41,21 +41,23 @@ import MarkdownRenderer from "./service/markdownRenderer"
  */
 export default class ExportMdPlugin extends Plugin {
   public isMobile: boolean
-  public logger
+  public logger: ILogger
   public kernelApi: KernelApi
+  private topbar: Topbar
 
   constructor(options: { app: App; id: string; name: string; i18n: IObject }) {
     super(options)
 
     this.logger = simpleLogger("index", "export-md", isDev)
     this.kernelApi = new KernelApi()
+    this.topbar = new Topbar(this)
   }
 
   async onload() {
     const frontEnd = getFrontend()
     this.isMobile = frontEnd === "mobile" || frontEnd === "browser-mobile"
 
-    await initTopbar(this)
+    await this.topbar.initTopbar()
   }
 
   //================================================================
