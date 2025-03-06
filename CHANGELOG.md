@@ -1,6 +1,30 @@
 <!-- insertion marker -->
 <a name="v0.0.3"></a>
 
+## [1.2.0](https://github.com/terwer/siyuan-plugin-2md/compare/v1.1.0...v1.2.0) (2025-03-06)
+
+
+### Features
+
+* support generate home page option ([dfafb6c](https://github.com/terwer/siyuan-plugin-2md/commit/dfafb6c246be2b47d106c7c95d2e84e3b52fb515))
+
+
+### Bug Fixes
+
+* **deps:** bump actions/cache from 3 to 4 ([b6d6e06](https://github.com/terwer/siyuan-plugin-2md/commit/b6d6e06c9797692c0ea62a35f1188936c81ed8e4))
+* **deps:** bump actions/setup-node from 3 to 4 ([66d8f24](https://github.com/terwer/siyuan-plugin-2md/commit/66d8f24c59d69d90a140322f18ab3f8cbace2797))
+* **deps:** bump pnpm/action-setup from 2 to 4 ([5bdf4cf](https://github.com/terwer/siyuan-plugin-2md/commit/5bdf4cfa9ebef2d11eac71c130268d1e8c27c455))
+* update docs ([5b020fb](https://github.com/terwer/siyuan-plugin-2md/commit/5b020fb305b996446b4dcd619fd333087c1320a0))
+* update docs ([b9461ff](https://github.com/terwer/siyuan-plugin-2md/commit/b9461ffc39d59b58b7a8b4b5afa08b29fdfb187c))
+
+
+### Miscellaneous
+
+* **deps-dev:** bump @types/node from 20.17.22 to 22.13.9 ([aaa525a](https://github.com/terwer/siyuan-plugin-2md/commit/aaa525a405b0d1c07ed946b92b383b1178f4ef32))
+* **deps-dev:** bump glob from 7.2.3 to 11.0.1 ([eb9ba20](https://github.com/terwer/siyuan-plugin-2md/commit/eb9ba200c9bae5dd961b1a8735e683db94019efb))
+* **deps-dev:** bump siyuan from 0.7.9 to 1.1.0 ([9423196](https://github.com/terwer/siyuan-plugin-2md/commit/9423196dafa599a9d47e10f289421ce74bb1ddc2))
+* **deps-dev:** bump vite-plugin-static-copy from 0.15.0 to 2.3.0 ([709f0b9](https://github.com/terwer/siyuan-plugin-2md/commit/709f0b93f316347a7883585221cf9ad12ea6ee35))
+
 ## [1.1.0](https://github.com/terwer/siyuan-plugin-2md/compare/v1.0.0...v1.1.0) (2025-03-04)
 ### Features
 * fix options ([a3954da](https://github.com/terwer/siyuan-plugin-2md/commit/a3954da1e44ea0b31434e63daeacc01fbdf24cab))
