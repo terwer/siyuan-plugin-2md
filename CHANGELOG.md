@@ -1,8 +1,20 @@
 <!-- insertion marker -->
 <a name="v0.0.3"></a>
 
-## [1.1.0](https://github.com/terwer/siyuan-plugin-2md/compare/v1.0.0...v1.1.0) (2025-03-04)
+## [1.2.0](https://github.com/terwer/siyuan-plugin-2md/compare/v1.1.0...v1.2.0) (2025-03-06)
 ### Features
+* support generate home page option ([dfafb6c](https://github.com/terwer/siyuan-plugin-2md/commit/dfafb6c246be2b47d106c7c95d2e84e3b52fb515))
+### Bug Fixes
+* **deps:** bump actions/cache from 3 to 4 ([b6d6e06](https://github.com/terwer/siyuan-plugin-2md/commit/b6d6e06c9797692c0ea62a35f1188936c81ed8e4))
+* **deps:** bump actions/setup-node from 3 to 4 ([66d8f24](https://github.com/terwer/siyuan-plugin-2md/commit/66d8f24c59d69d90a140322f18ab3f8cbace2797))
+* **deps:** bump pnpm/action-setup from 2 to 4 ([5bdf4cf](https://github.com/terwer/siyuan-plugin-2md/commit/5bdf4cfa9ebef2d11eac71c130268d1e8c27c455))
+* update docs ([b9461ff](https://github.com/terwer/siyuan-plugin-2md/commit/b9461ffc39d59b58b7a8b4b5afa08b29fdfb187c))
+### Miscellaneous
+* **deps-dev:** bump @types/node from 20.17.22 to 22.13.9 ([aaa525a](https://github.com/terwer/siyuan-plugin-2md/commit/aaa525a405b0d1c07ed946b92b383b1178f4ef32))
+* **deps-dev:** bump glob from 7.2.3 to 11.0.1 ([eb9ba20](https://github.com/terwer/siyuan-plugin-2md/commit/eb9ba200c9bae5dd961b1a8735e683db94019efb))
+* **deps-dev:** bump siyuan from 0.7.9 to 1.1.0 ([9423196](https://github.com/terwer/siyuan-plugin-2md/commit/9423196dafa599a9d47e10f289421ce74bb1ddc2))
+* **deps-dev:** bump vite-plugin-static-copy from 0.15.0 to 2.3.0 ([709f0b9](https://github.com/terwer/siyuan-plugin-2md/commit/709f0b93f316347a7883585221cf9ad12ea6ee35))
+## [1.1.0](https://github.com/terwer/siyuan-plugin-2md/compare/v1.0.0...v1.1.0) (2025-03-04)
 * fix options ([a3954da](https://github.com/terwer/siyuan-plugin-2md/commit/a3954da1e44ea0b31434e63daeacc01fbdf24cab))
 * support document mode ([ccd37ef](https://github.com/terwer/siyuan-plugin-2md/commit/ccd37ef76cccd048bbd82c9b810bee82b976bcd5))
 * support presets ([15a07c6](https://github.com/terwer/siyuan-plugin-2md/commit/15a07c6f4a2cde9ce7b0157180288e72d476b428))
@@ -16,7 +28,6 @@
 * 导出到 vuepress ([9f1b4eb](https://github.com/terwer/siyuan-plugin-2md/commit/9f1b4eb2300060d502b73199491194717624f7d8))
 * 支持导出目录 ([7087b6b](https://github.com/terwer/siyuan-plugin-2md/commit/7087b6b8c89bc4370dd6a1f2a1176b2c5f0e1574))
 * 适配 frontformatter ([8477bf3](https://github.com/terwer/siyuan-plugin-2md/commit/8477bf3aae8b74443c1d56137e6f6bac0a1244fd))
-### Miscellaneous
 * 优化打包脚本 ([7e12fe6](https://github.com/terwer/siyuan-plugin-2md/commit/7e12fe65c410281597abe66e1032eb4e794271bd))
 ## [0.1.0](https://github.com/terwer/siyuan-plugin-custom-slug/compare/v0.0.3...v0.1.0) (2023-06-01)
 * 刚刚闹了个乌龙，重新打包一次 ([6c4d62b](https://github.com/terwer/siyuan-plugin-custom-slug/commit/6c4d62bb00e34f3e568bb789bb70aefc75af939f))

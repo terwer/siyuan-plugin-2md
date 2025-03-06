@@ -25,15 +25,12 @@
 
 import ExportMdPlugin from "./index"
 import { icons } from "./utils/svg"
-import { Dialog, Menu } from "siyuan"
+import { Dialog } from "siyuan"
 import Export from "./libs/Export.svelte"
 import pkg from "../package.json"
 
 class Topbar {
   protected pluginInstance: ExportMdPlugin
-  private rect: DOMRect
-  private contentMenu: Menu
-  private contentMenuElement: HTMLElement
 
   constructor(pluginInstance: ExportMdPlugin) {
     this.pluginInstance = pluginInstance
