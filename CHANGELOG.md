@@ -1,6 +1,13 @@
 <!-- insertion marker -->
 <a name="v0.0.3"></a>
 
+## [1.2.1](https://github.com/terwer/siyuan-plugin-2md/compare/v1.2.0...v1.2.1) (2025-11-13)
+
+
+### Bug Fixes
+
+* compress icons ([f6255bb](https://github.com/terwer/siyuan-plugin-2md/commit/f6255bba2497e2a5624d0ede62241e59eac5a681))
+
 ## [1.2.0](https://github.com/terwer/siyuan-plugin-2md/compare/v1.1.0...v1.2.0) (2025-03-06)
 ### Features
 * support generate home page option ([dfafb6c](https://github.com/terwer/siyuan-plugin-2md/commit/dfafb6c246be2b47d106c7c95d2e84e3b52fb515))
