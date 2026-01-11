@@ -33,7 +33,7 @@
     "stylus": "^0.64.0",
     "svelte": "4.2.19",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.2",
+    "typescript": "^5.8.3",
     "vite": "5.4.10",
     "vite-plugin-static-copy": "^2.3.0",
     "vite-plugin-zip-pack": "^1.2.4"
